@@ -98,3 +98,4 @@
 | 20 | 2026-10-12 | S03.02 registry results + selection quality fix | 300 boards auto-selected, gig aggregators excluded, target companies prioritised | live daily run with expanded boards |
 | 21 | 2026-10-12 | Registry progress log + S04.01 Extractor agent (code + guards) | 8 tests pass | E-01 dataset from real WhatsApp channel posts + pages |
 | 22 | 2026-10-12 | E-01 harness + Haiku baseline (12 real posts); WhatsApp Edge session found logged out → H12 | 100% on small set; not counted as pass | daily run (expanded boards) still running |
+| 23 | 2026-10-13 | INCIDENT: daily run hung ~5h on one Cloudflare-hosted board (httpx timeout is per-read, not per-request; laptop likely slept). Killed it (state untouched). FIX: base.fetch hard whole-request deadline (60s, streamed), used by all collectors + registry; trickle-forever regression tests | 4 new adversarial tests pass | rerun daily; then S04.05 page watcher / E-11 |

@@ -60,22 +60,51 @@ def polite_client(timeout_s: float = 20) -> httpx.Client:
     return httpx.Client(timeout=timeout_s, headers={"User-Agent": USER_AGENT}, follow_redirects=True)
 
 
+REQUEST_DEADLINE_S = 60.0
+
+
+class RequestDeadline(httpx.TransportError):
+    """Whole-request wall-clock limit exceeded (body trickling or stalled)."""
+
+
+def fetch(client: httpx.Client, url: str, deadline_s: float = REQUEST_DEADLINE_S,
+          clock=time.monotonic) -> tuple[int, bytes]:
+    """GET with a HARD wall-clock deadline on the whole response.
+
+    httpx's timeout is per read operation, so a server that keeps a connection
+    open and trickles (or stalls after a laptop sleep/resume) can hang a run for
+    hours — the 2026-10-12 daily run hung ~5h on one Cloudflare-hosted board. The
+    body is streamed and the deadline checked between chunks; a single stalled read
+    is still bounded by the client's read timeout.
+    """
+    end = clock() + deadline_s
+    with client.stream("GET", url) as resp:
+        chunks = []
+        for chunk in resp.iter_bytes():
+            chunks.append(chunk)
+            if clock() > end:
+                raise RequestDeadline(f"exceeded {deadline_s:.0f}s: {url}")
+        return resp.status_code, b"".join(chunks)
+
+
 def get_json(client: httpx.Client, url: str, *, retries: int = 3, backoff_s: float = 2.0,
-             sleep=time.sleep) -> Any:
-    """GET with retry on 429/5xx/network errors. 4xx (except 429) is not retried."""
+             sleep=time.sleep, deadline_s: float = REQUEST_DEADLINE_S) -> Any:
+    """GET JSON with a hard per-request deadline; retry on 429/5xx/network errors/deadline.
+    4xx (except 429) is not retried."""
     last: Exception | None = None
     for attempt in range(retries + 1):
         try:
-            resp = client.get(url)
-        except httpx.TransportError as exc:
+            status, body = fetch(client, url, deadline_s)
+        except httpx.TransportError as exc:          # includes RequestDeadline
             last = exc
         else:
-            if resp.status_code == 429 or resp.status_code >= 500:
-                last = httpx.HTTPStatusError(f"{resp.status_code}", request=resp.request, response=resp)
-            elif resp.status_code >= 400:
-                resp.raise_for_status()
+            if status == 429 or status >= 500:
+                last = httpx.HTTPError(f"HTTP {status}: {url}")
+            elif status >= 400:
+                raise httpx.HTTPStatusError(f"HTTP {status}: {url}", request=httpx.Request("GET", url),
+                                            response=httpx.Response(status))
             else:
-                return resp.json()
+                return json.loads(body)
         if attempt < retries:
             sleep(backoff_s * (2 ** attempt))
     raise last  # type: ignore[misc]

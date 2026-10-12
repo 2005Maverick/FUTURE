@@ -18,7 +18,7 @@ from urllib.parse import parse_qs, urlsplit
 
 import httpx
 
-from future.collectors.base import SEEDS_DIR, polite_client
+from future.collectors.base import SEEDS_DIR, fetch, polite_client
 from future.pipeline.location import parse_location
 from future.pipeline.relevance import role_relevance
 
@@ -116,10 +116,10 @@ def _jobs_of(ats: str, data) -> list[tuple[str, str]]:
 def validate(ats: str, slug: str, client: httpx.Client) -> BoardStats:
     now = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
     try:
-        r = client.get(LIST_API[ats].format(slug=slug))
-        if r.status_code != 200:
-            return BoardStats(ats, slug, 0, 0, 0, now, f"http {r.status_code}")
-        jobs = _jobs_of(ats, r.json())
+        status, body = fetch(client, LIST_API[ats].format(slug=slug))   # hard deadline (see base.fetch)
+        if status != 200:
+            return BoardStats(ats, slug, 0, 0, 0, now, f"http {status}")
+        jobs = _jobs_of(ats, json.loads(body))
     except Exception as exc:
         return BoardStats(ats, slug, 0, 0, 0, now, type(exc).__name__)
     relevant = [(t, loc) for t, loc in jobs if role_relevance(t) == "relevant"]
