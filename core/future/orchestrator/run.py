@@ -23,11 +23,28 @@ LOCK_DIR = config.REPO_ROOT / "private" / "locks"
 LOCAL_LOG = config.REPO_ROOT / "private" / "logs" / "runs.jsonl"
 
 
+LOCAL_STATE = config.REPO_ROOT / "private" / "data" / "state.json"
+
+
 def make_store() -> tuple[Store, str]:
     cfg = config.load()
     if cfg.has_db_write_access:
         return SupabaseStore(cfg.supabase_url, cfg.supabase_secret_key), "supabase"
-    return MemoryStore(), "memory"  # until H11: results also go to the local JSONL log
+    from future.store_local import LocalFileStore
+    return LocalFileStore(LOCAL_STATE), "local"   # until H11: persistent JSON snapshot in private/
+
+
+def greenhouse_plan():
+    from future.collectors.greenhouse import GreenhouseCollector
+    from future.orchestrator.collect import SourceSpec
+    return [(GreenhouseCollector(), SourceSpec(kind="ats", track="job", method="greenhouse_job_board_api",
+                                               url="https://boards-api.greenhouse.io", terms_verdict="allowed"))]
+
+
+def stage_daily(store: Store, max_evals: int = 40) -> dict:
+    from dataclasses import asdict
+    from future.orchestrator.daily import run_daily
+    return asdict(run_daily(store, greenhouse_plan(), today=dt.date.today(), max_evals=max_evals))
 
 
 def stage_healthcheck(store: Store) -> dict:
@@ -67,7 +84,7 @@ def stage_collect(store: Store) -> dict:
 
 def dump_local_raw(store: Store, stage: str) -> Path | None:
     """Until H11 (DB writes), persist MemoryStore raw items to private/data/raw/."""
-    raw = getattr(store, "raw", None)
+    raw = {k: v for k, v in (getattr(store, "raw", None) or {}).items() if "payload" in v}
     if not raw:
         return None
     out = config.REPO_ROOT / "private" / "data" / "raw" / f"{dt.date.today().isoformat()}-{stage}.jsonl"
@@ -78,21 +95,27 @@ def dump_local_raw(store: Store, stage: str) -> Path | None:
     return out
 
 
-STAGES = {"healthcheck": stage_healthcheck, "collect": stage_collect}
+STAGES = {"healthcheck": stage_healthcheck, "collect": stage_collect, "daily": stage_daily}
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="future-run")
     parser.add_argument("--stage", required=True, choices=sorted(STAGES))
+    parser.add_argument("--max-evals", type=int, default=None, help="daily: cap model evaluations this run")
     args = parser.parse_args(argv)
     store, backend = make_store()
+    kwargs = {"max_evals": args.max_evals} if args.stage == "daily" and args.max_evals is not None else {}
     try:
         with InstanceLock(LOCK_DIR / f"{args.stage}.lock"):
-            result = STAGES[args.stage](store)
+            try:
+                result = STAGES[args.stage](store, **kwargs)
+            finally:
+                if hasattr(store, "save"):
+                    store.save()          # persist even if a stage failed midway
     except LockHeld as exc:
         print(f"skip: {exc}")
         return 0
-    if backend == "memory":
+    if backend in ("memory", "local"):
         dumped = dump_local_raw(store, args.stage)
         if dumped:
             result = {**result, "local_raw_file": str(dumped)}

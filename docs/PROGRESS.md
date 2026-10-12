@@ -50,8 +50,8 @@
 | S02.02 | Normaliser + dedup + eligibility v1 (E-02 subset) | done | E-02 15/15 + 0 ineligible pass; live audit caught over-broad title rule (91 passes incl. recruiters) → role-relevance rewrite, 41 real-title regression tests; now 6,029→5,348 deduped → 37 pass / 351 unclear / 4,960 fail, manual audit 0 ineligible passes (evals/results/G02/S02.02-live-audit.txt) |
 | S02.03 | Evaluator v1 (jobs rubric) | done | agent .claude/agents/evaluator.md + rubrics/jobs.md + private profile; deterministic guards (verbatim quotes, jsonschema, rubric-consistent recs, budget); live 12 roles: 65/66 quotes verified, 1 invented quote dropped; tokens cut 13.4k→6.0k/eval via single-turn JSON (ADR-001 #6); pre-filter gap 'Exp: 3-15yrs' fixed. Quality vs Pranav = E-03 (needs H5) |
 | S02.04 | Ranking + digest v1 | done | pipeline/ranking.py (deterministic, per-component breakdown, weights PROVISIONAL until E-03) + digest/build.py; 9 tests; real digest rendered from 12 live evals (private/digests/2026-10-12.md). Found: evals must be keyed by dedup_key, not org+title (Stripe same title in 4 cities) → requirement for S02.05b |
-| S02.05b | Daily stage: collect→normalize→evaluate (keyed by dedup_key, eval cache, budget-ordered)→rank→digest; local persistence until H11 | todo | added 2026-10-12 |
-| S02.05 | Sheet mirror (Apps Script) | todo | |
+| S02.05b | Daily stage: collect→normalize→evaluate (keyed by dedup_key, eval cache, budget-ordered)→rank→digest; local persistence until H11 | done | orchestrator/daily.py + LocalFileStore + migrations 0003/0004; 7 integration tests incl. keying regression; live: run1 6 evals/43k tokens, run2 0 tokens all cached (evals/results/G02/S02.05b-live-daily.txt). Finding: judge variance on close calls (3 vs 4) → E-03 |
+| S02.05 | Sheet mirror (Apps Script) | blocked:H11 | reads Supabase; no rows there until the secret key is set |
 | S02.06 | Dashboard v0 (local first; deploy needs H2) | todo | |
 | G02 | Gate | todo | |
 | S03.01–S03.07 | Jobs track complete | todo | S03.07 needs H5 |
@@ -79,3 +79,4 @@
 | 10 | 2026-10-12 | S02.02 normaliser, dedup, eligibility + role relevance | live audit found & fixed false passes; 0 ineligible in final 37 | S02.03 Evaluator v1 (jobs rubric) via skill |
 | 11 | 2026-10-12 | S02.03 Evaluator agent v1 + live slice + token optimisation | 12 live evals sane & evidence-backed; -55% tokens/eval | S02.04 ranking + digest v1 |
 | 12 | 2026-10-12 | S02.04 ranking + digest (interrupted by Pranav's server question, resumed) | 9 tests; real digest; keying requirement found | S02.05b daily stage wiring |
+| 13 | 2026-10-12 | S02.05b daily pipeline end-to-end + local persistence | live E2E works; cache = 0 tokens on rerun; city bug fixed | S02.06 dashboard v0 (code + auth; deploy needs H2, data needs H11) |

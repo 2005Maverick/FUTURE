@@ -45,6 +45,18 @@ class Store(Protocol):
                       terms_verdict: str) -> str: ...
     def add_raw_items(self, source_id: str, records: list[Any]) -> int: ...
     def update_source_health(self, source_id: str, health: str, yield_stats: dict[str, Any]) -> None: ...
+    # opportunities / evaluations / digests (S02.05b). Opportunities are keyed by dedup_key;
+    # an existing opportunity's status is never overwritten by re-ingestion.
+    def upsert_opportunities(self, rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]: ...
+    def update_opportunity(self, opp_id: str, fields: dict[str, Any]) -> None: ...
+    def get_evaluation(self, opp_id: str, rubric_version: str, input_hash: str) -> dict[str, Any] | None: ...
+    def add_evaluation(self, opp_id: str, row: dict[str, Any]) -> None: ...
+    def add_digest(self, for_date: dt.date, content_md: str) -> None: ...
+
+
+OPP_INSERT_FIELDS = ("type", "track", "title", "org", "url", "canonical_url", "dedup_key", "location", "remote",
+                     "countries", "deadline", "eligibility", "details", "status", "skip_reason")
+OPP_REFRESH_FIELDS = ("location", "details", "eligibility")   # safe to refresh on re-ingestion
 
 
 def raw_row(source_id: str, record: Any) -> dict[str, Any]:
@@ -62,7 +74,39 @@ class MemoryStore:
         self.settings: dict[str, Any] = {}
         self.sources_by_name: dict[str, dict[str, Any]] = {}
         self.raw: dict[str, dict[str, Any]] = {}
+        self.opps: dict[str, dict[str, Any]] = {}          # dedup_key -> row (id == dedup_key here)
+        self.evals: list[dict[str, Any]] = []
+        self.digests: dict[str, str] = {}
         self._ids = itertools.count(1)
+
+    def upsert_opportunities(self, rows):
+        now = dt.datetime.now(dt.timezone.utc).isoformat()
+        out = {}
+        for row in rows:
+            key = row["dedup_key"]
+            if key in self.opps:
+                existing = self.opps[key]
+                existing.update({k: row[k] for k in OPP_REFRESH_FIELDS if k in row}, last_seen_at=now)
+            else:
+                self.opps[key] = {**{k: row.get(k) for k in OPP_INSERT_FIELDS}, "id": key,
+                                  "first_seen_at": now, "last_seen_at": now, "priority": None}
+            out[key] = {"id": self.opps[key]["id"], "status": self.opps[key]["status"]}
+        return out
+
+    def update_opportunity(self, opp_id, fields):
+        self.opps[opp_id].update(fields)
+
+    def get_evaluation(self, opp_id, rubric_version, input_hash):
+        for row in reversed(self.evals):
+            if (row["opportunity_id"], row["rubric_version"], row["input_hash"]) == (opp_id, rubric_version, input_hash):
+                return row
+        return None
+
+    def add_evaluation(self, opp_id, row):
+        self.evals.append({**row, "opportunity_id": opp_id})
+
+    def add_digest(self, for_date, content_md):
+        self.digests[for_date.isoformat()] = content_md
 
     def start_run(self, stage, agent, meta):
         run_id = str(uuid.uuid4())
@@ -175,6 +219,36 @@ class SupabaseStore:
                              headers={"Prefer": "resolution=ignore-duplicates,return=representation"})
             new += len(resp.json())
         return new
+
+    def upsert_opportunities(self, rows, batch: int = 300, key_batch: int = 100):
+        # 1) insert only NEW rows (existing ones keep their status) 2) refresh safe fields 3) read back id/status
+        for i in range(0, len(rows), batch):
+            chunk = [{k: r.get(k) for k in OPP_INSERT_FIELDS} for r in rows[i:i + batch]]
+            self._req("POST", "opportunities?on_conflict=dedup_key", json=chunk,
+                      headers={"Prefer": "resolution=ignore-duplicates,return=minimal"})
+        out: dict[str, dict[str, Any]] = {}
+        keys = [r["dedup_key"] for r in rows]
+        for i in range(0, len(keys), key_batch):
+            in_list = ",".join(keys[i:i + key_batch])
+            for rec in self._req("GET", f"opportunities?select=id,status,dedup_key&dedup_key=in.({in_list})").json():
+                out[rec["dedup_key"]] = {"id": rec["id"], "status": rec["status"]}
+        # Not yet: refreshing location/details/last_seen_at on existing rows needs a bulk RPC (S03.04 liveness).
+        return out
+
+    def update_opportunity(self, opp_id, fields):
+        self._req("PATCH", f"opportunities?id=eq.{opp_id}", json=fields)
+
+    def get_evaluation(self, opp_id, rubric_version, input_hash):
+        rows = self._req("GET", f"evaluations?select=*&opportunity_id=eq.{opp_id}&rubric_version=eq.{rubric_version}"
+                                f"&input_hash=eq.{input_hash}&order=created_at.desc&limit=1").json()
+        return rows[0] if rows else None
+
+    def add_evaluation(self, opp_id, row):
+        self._req("POST", "evaluations", json={**row, "opportunity_id": opp_id})
+
+    def add_digest(self, for_date, content_md):
+        self._req("POST", "digests?on_conflict=for_date", json={"for_date": for_date.isoformat(), "content_md": content_md},
+                  headers={"Prefer": "resolution=merge-duplicates"})
 
     def update_source_health(self, source_id, health, yield_stats):
         self._req("PATCH", f"sources?id=eq.{source_id}", json={

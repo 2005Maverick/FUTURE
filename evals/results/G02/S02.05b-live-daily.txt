@@ -1,0 +1,5 @@
+S02.05b live daily run 2026-10-12
+run1: collected=6031 new_raw=6031 opportunities=5365 pass=36 unclear=351 skipped=4978 evaluated_now=6 pending=381 shortlisted=2 tokens~43.1k time=1m50s
+run2 (same day): new_raw=0 evaluated_now=0 evaluated_cached=6 tokens=0 time=54s
+keying regression fixed live: Stripe SWE Intern shown with correct city (Bengaluru)
+finding: same Stripe intern posting scored 3/5 (S02.03 run) vs 4/5 (this run): judge variance on close calls -> track in E-03
