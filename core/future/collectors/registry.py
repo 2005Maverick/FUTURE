@@ -136,12 +136,39 @@ def validate_all(pairs: list[tuple[str, str]], client: httpx.Client, workers: in
         return list(pool.map(lambda p: validate(p[0], p[1], client), pairs))
 
 
-def selected(stats: list[BoardStats], min_relevant_india_ok: int = 1) -> dict[str, list[str]]:
+# First live harvest (2026-10-12): the top boards by raw count were data-labelling gig
+# platforms and staffing aggregators (Prolific 3,931 jobs, Innodata, "agency") that would
+# flood the queue. Huge boards are therefore excluded from AUTO-selection (add by hand if
+# wanted), and auto-picks are capped so the daily run stays fast.
+MAX_BOARD_JOBS = 1500
+MAX_SELECTED = 300
+
+
+def selected(stats: list[BoardStats], min_relevant_india_ok: int = 1, max_jobs: int = MAX_BOARD_JOBS,
+             cap: int = MAX_SELECTED) -> dict[str, list[str]]:
+    eligible = [s for s in stats if s.error is None and s.relevant_india_ok >= min_relevant_india_ok
+                and s.jobs <= max_jobs]
+    eligible.sort(key=lambda s: (-s.relevant_india_ok, s.ats, s.slug))
     out: dict[str, list[str]] = {}
-    for s in stats:
-        if s.error is None and s.relevant_india_ok >= min_relevant_india_ok:
-            out.setdefault(s.ats, []).append(s.slug)
+    for s in eligible[:cap]:
+        out.setdefault(s.ats, []).append(s.slug)
     return {k: sorted(v) for k, v in out.items()}
+
+
+def manual_seeds(ats: str) -> set[str]:
+    seed_file = SEEDS_DIR / f"{ats}.txt"
+    if not seed_file.exists():
+        return set()
+    return {ln.strip() for ln in seed_file.read_text(encoding="utf-8").splitlines()
+            if ln.strip() and not ln.lstrip().startswith("#")}
+
+
+def reselect_from_saved(path: Path = REGISTRY_FILE) -> dict[str, int]:
+    """Re-apply the selection rules to the last harvest without re-harvesting."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    stats = [BoardStats(**b) for b in data["boards"]]
+    save_registry(stats, path)
+    return {k: len(v) for k, v in selected(stats).items()}
 
 
 def save_registry(stats: list[BoardStats], path: Path = REGISTRY_FILE) -> None:

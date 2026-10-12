@@ -62,8 +62,21 @@ def opportunity_row(o: norm.Opportunity) -> dict:
 
 
 def candidate_order(o: norm.Opportunity) -> tuple:
-    """Cheap pre-ranking before any model spend: eligible-pass first, India-located first."""
-    return (o.eligibility.result != "pass", "IN" not in o.countries, o.title)
+    """Cheap pre-ranking before any model spend: Pranav's hand-picked target companies first
+    (manual seeds), then eligible-pass, then India-located."""
+    source, board = o.details.get("source"), o.details.get("board")
+    priority_board = bool(source and board and board in _manual_cache(source))
+    return (not priority_board, o.eligibility.result != "pass", "IN" not in o.countries, o.title)
+
+
+_MANUAL: dict[str, set[str]] = {}
+
+
+def _manual_cache(source: str) -> set[str]:
+    if source not in _MANUAL:
+        from future.collectors.registry import manual_seeds
+        _MANUAL[source] = manual_seeds(source)
+    return _MANUAL[source]
 
 
 def run_daily(store: Store, plan: list[tuple[Collector, SourceSpec]], *, today: dt.date,

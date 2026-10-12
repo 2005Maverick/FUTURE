@@ -54,6 +54,14 @@ def test_validate_records_http_errors():
     assert s.error == "http 404" and s.jobs == 0
 
 
+def test_selection_excludes_aggregators_ranks_and_caps():
+    stats = [reg.BoardStats("greenhouse", "prolific", 3931, 2500, 2402, "t"),     # gig aggregator: excluded
+             reg.BoardStats("ashby", "small", 20, 3, 1, "t"),
+             reg.BoardStats("ashby", "strong", 90, 30, 25, "t"),
+             reg.BoardStats("lever", "mid", 40, 9, 5, "t")]
+    assert reg.selected(stats, cap=2) == {"ashby": ["strong"], "lever": ["mid"]}
+
+
 def test_selection_and_seed_union(tmp_path, monkeypatch):
     stats = [reg.BoardStats("ashby", "a", 5, 2, 1, "t"), reg.BoardStats("ashby", "b", 5, 2, 0, "t"),
              reg.BoardStats("lever", "c", 1, 1, 1, "t", error="http 404")]
