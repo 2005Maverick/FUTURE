@@ -1,0 +1,2 @@
+live probe 2026-10-12T16:58:34: awake=True services={'ollama': False, 'searxng': False} took=5.3s
+route(ollama, just queued) = wait
