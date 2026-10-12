@@ -1,0 +1,27 @@
+# Greenhouse board tokens (public job-board API). Verified live 2026-10-12.
+# Expanded later by the company registry (S03.02).
+anthropic
+scaleai
+databricks
+figma
+stripe
+airbnb
+coinbase
+discord
+instacart
+robinhood
+cloudflare
+gitlab
+mongodb
+datadog
+groww
+togetherai
+stabilityai
+vercel
+brex
+chime
+dropbox
+asana
+twilio
+okta
+duolingo

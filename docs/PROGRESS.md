@@ -46,7 +46,7 @@
 | ST01.04.05 | Task Scheduler registration | done | scripts/task_scheduler.ps1 (jobs created DISABLED); live: register→fire→exit 0x0→removed; run.py healthcheck stage |
 | ST01.05.* | trijya-3 Docker/Ollama/SearXNG/Crawl4AI | blocked:H1 | |
 | G01 | Gate | done (PASS WITH RISK) | evals/results/G01/GATE-G01.md; risks: H11 (live DB writes), H1 (trijya base) |
-| S02.01 | Greenhouse collector (30-company seed) | todo | |
+| S02.01 | Greenhouse collector (30-company seed) | done | 25 live boards (others use Ashby/Lever → S03.01); live run 25/25 ok, 6,029 postings, 32s, 0 tokens (evals/results/G02/S02.01-live-collect.txt); 7 unit tests |
 | S02.02 | Normaliser + dedup + eligibility v1 (E-02 subset) | todo | |
 | S02.03 | Evaluator v1 (jobs rubric) | todo | |
 | S02.04 | Ranking + digest v1 | todo | |
@@ -74,3 +74,4 @@
 | 6 | 2026-10-12 | ST01.04.02 resumable stages (durable progress ledger) + single-instance lock | E-08 PASS (real process kill, 5/5 stable) | ST01.04.04 trijya-3 probe + queue policy |
 | 7 | 2026-10-12 | ST01.04.04 trijya-3 probe + run/wait/fallback policy | 6 tests pass; live probe correct | ST01.04.05 Task Scheduler registration script |
 | 8 | 2026-10-12 | ST01.04.05 scheduler script + healthcheck stage; G01 gate | G01 PASS WITH RISK | P02: S02.01 Greenhouse collector |
+| 9 | 2026-10-12 | S02.01 Greenhouse collector + collect stage + source health | live 6,029 postings; 136 rough India/remote ML matches | S02.02 normaliser + dedup + eligibility (US-only remote = ineligible) |

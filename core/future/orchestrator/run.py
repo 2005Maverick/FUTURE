@@ -48,7 +48,37 @@ def stage_healthcheck(store: Store) -> dict:
     return report
 
 
-STAGES = {"healthcheck": stage_healthcheck}
+def stage_collect(store: Store) -> dict:
+    from future.collectors.greenhouse import GreenhouseCollector
+    from future.orchestrator.collect import SourceSpec, run_collector
+
+    plan = [(GreenhouseCollector(), SourceSpec(kind="ats", track="job", method="greenhouse_job_board_api",
+                                               url="https://boards-api.greenhouse.io", terms_verdict="allowed"))]
+    results = {}
+    with run_stage(store, "collect") as ctx:
+        for collector, spec in plan:
+            try:
+                results[collector.name] = run_collector(store, ctx, collector, spec)
+            except Exception as exc:  # one source failing must not stop the others
+                results[collector.name] = {"error": f"{type(exc).__name__}: {exc}"}
+                ctx.event("source_failed", collector.name, level="error", error=str(exc)[:300])
+    return results
+
+
+def dump_local_raw(store: Store, stage: str) -> Path | None:
+    """Until H11 (DB writes), persist MemoryStore raw items to private/data/raw/."""
+    raw = getattr(store, "raw", None)
+    if not raw:
+        return None
+    out = config.REPO_ROOT / "private" / "data" / "raw" / f"{dt.date.today().isoformat()}-{stage}.jsonl"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with open(out, "w", encoding="utf-8") as fh:
+        for row in raw.values():
+            fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+    return out
+
+
+STAGES = {"healthcheck": stage_healthcheck, "collect": stage_collect}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -62,6 +92,10 @@ def main(argv: list[str] | None = None) -> int:
     except LockHeld as exc:
         print(f"skip: {exc}")
         return 0
+    if backend == "memory":
+        dumped = dump_local_raw(store, args.stage)
+        if dumped:
+            result = {**result, "local_raw_file": str(dumped)}
     LOCAL_LOG.parent.mkdir(parents=True, exist_ok=True)
     with open(LOCAL_LOG, "a", encoding="utf-8") as fh:
         fh.write(json.dumps({"at": dt.datetime.now().isoformat(timespec="seconds"), "stage": args.stage,

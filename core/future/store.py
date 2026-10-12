@@ -41,6 +41,15 @@ class Store(Protocol):
     def tokens_used_since(self, since: dt.datetime) -> int: ...
     def get_setting(self, key: str, default: Any = None) -> Any: ...
     def set_setting(self, key: str, value: Any) -> None: ...
+    def ensure_source(self, name: str, *, kind: str, track: str, method: str, url: str | None,
+                      terms_verdict: str) -> str: ...
+    def add_raw_items(self, source_id: str, records: list[Any]) -> int: ...
+    def update_source_health(self, source_id: str, health: str, yield_stats: dict[str, Any]) -> None: ...
+
+
+def raw_row(source_id: str, record: Any) -> dict[str, Any]:
+    return {"source_id": source_id, "external_id": record.external_id, "url": record.url,
+            "content_hash": record.content_hash, "payload": record.payload}
 
 
 class MemoryStore:
@@ -51,6 +60,8 @@ class MemoryStore:
         self.events: list[dict[str, Any]] = []
         self.budget: list[BudgetEntry] = []
         self.settings: dict[str, Any] = {}
+        self.sources_by_name: dict[str, dict[str, Any]] = {}
+        self.raw: dict[str, dict[str, Any]] = {}
         self._ids = itertools.count(1)
 
     def start_run(self, stage, agent, meta):
@@ -78,6 +89,26 @@ class MemoryStore:
 
     def set_setting(self, key, value):
         self.settings[key] = value
+
+    # sources & raw items
+    def ensure_source(self, name, *, kind, track, method, url, terms_verdict):
+        if name not in self.sources_by_name:
+            self.sources_by_name[name] = {"id": str(uuid.uuid4()), "kind": kind, "track": track, "method": method,
+                                          "url": url, "terms_verdict": terms_verdict, "health": "unknown", "yield": {}}
+        return self.sources_by_name[name]["id"]
+
+    def add_raw_items(self, source_id, records):
+        new = 0
+        for rec in records:
+            if rec.content_hash not in self.raw:
+                self.raw[rec.content_hash] = raw_row(source_id, rec)
+                new += 1
+        return new
+
+    def update_source_health(self, source_id, health, yield_stats):
+        for src in self.sources_by_name.values():
+            if src["id"] == source_id:
+                src.update(health=health, **{"yield": yield_stats})
 
 
 class SupabaseStore:
@@ -128,3 +159,23 @@ class SupabaseStore:
     def set_setting(self, key, value):
         self._req("POST", "settings", json={"key": key, "value": value},
                   headers={"Prefer": "resolution=merge-duplicates"})
+
+    def ensure_source(self, name, *, kind, track, method, url, terms_verdict):
+        rows = self._req("POST", "sources?on_conflict=name", json={
+            "name": name, "kind": kind, "track": track, "method": method, "url": url,
+            "terms_verdict": terms_verdict},
+            headers={"Prefer": "resolution=merge-duplicates,return=representation"}).json()
+        return rows[0]["id"]
+
+    def add_raw_items(self, source_id, records, batch: int = 500):
+        new = 0
+        for i in range(0, len(records), batch):
+            chunk = [raw_row(source_id, r) for r in records[i:i + batch]]
+            resp = self._req("POST", "raw_items?on_conflict=content_hash", json=chunk,
+                             headers={"Prefer": "resolution=ignore-duplicates,return=representation"})
+            new += len(resp.json())
+        return new
+
+    def update_source_health(self, source_id, health, yield_stats):
+        self._req("PATCH", f"sources?id=eq.{source_id}", json={
+            "health": health, "yield": yield_stats, "last_run_at": dt.datetime.now(dt.timezone.utc).isoformat()})
