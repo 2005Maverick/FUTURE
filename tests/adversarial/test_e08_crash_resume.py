@@ -17,7 +17,13 @@ WORKER = Path(__file__).with_name("crash_worker.py")
 
 def test_real_kill_then_resume_loses_nothing(tmp_path):
     child = subprocess.Popen([sys.executable, str(WORKER), str(tmp_path)])
-    time.sleep(0.9)                       # let it get partway (~8 of 20 items)
+    # Kill on observed progress, not after a fixed sleep: under a loaded machine the
+    # child's start-up time varies, and a fixed 0.9s sleep landed outside the window.
+    progress_file, give_up = tmp_path / "progress.jsonl", time.monotonic() + 60
+    while time.monotonic() < give_up and child.poll() is None:
+        if progress_file.exists() and len(JsonlProgress(progress_file).done_keys("crashtest")) >= 3:
+            break
+        time.sleep(0.01)
     child.kill()
     child.wait()
     first_pass = JsonlProgress(tmp_path / "progress.jsonl").done_keys("crashtest")
