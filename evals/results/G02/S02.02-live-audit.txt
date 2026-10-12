@@ -1,0 +1,54 @@
+raw=6029 after_dedupe=5348 | eligibility={'fail': 4960, 'unclear': 351, 'pass': 37}
+
+ALL PASS:
+ Anthropic | Applied AI Engineer, Beneficial Deployments (Life Sciences) | San Francisco, CA | New York City, NY | San Francisco, CA
+ Anthropic | Data Engineer, Product | San Francisco, CA | New York City, NY | Seattle, WA | San Fr
+ Anthropic | [Expression of Interest] Research Engineer / Scientist, Alignment - London | London, UK | London, UK
+ Anthropic | Full Stack Engineer, Education Labs | San Francisco, CA | New York City, NY | Seattle, WA | San Fr
+ Anthropic | Full-Stack Software Engineer, Reinforcement Learning | San Francisco, CA | New York City, NY | San Francisco, CA
+ Anthropic | Machine Learning Infrastructure Engineer, Safeguards Research | San Francisco, CA | New York City, NY | San Francisco, CA
+ Anthropic | Performance Engineer, GPU | San Francisco, CA | New York City, NY | Seattle, WA | San Fr
+ Anthropic | Performance Engineer, Inference Engine | San Francisco, CA | New York City, NY | San Francisco, CA
+ Anthropic | Performance Engineer, Inference Systems | San Francisco, CA | New York City, NY | Seattle, WA | San Fr
+ Anthropic | Pre-training Data Infrastructure Engineer | San Francisco, CA | San Francisco, CA
+ Anthropic | Research Engineer, Chip Design RL (Reinforcement Learning) | San Francisco, CA | New York City, NY | San Francisco, CA
+ Anthropic | Research Engineer, Code RL (Reinforcement Learning) | San Francisco, CA | New York City, NY | San Francisco, CA
+ Anthropic | Research Engineer, Computer Use | San Francisco, CA | New York City, NY | Seattle, WA | New Yo
+ Anthropic | Research Engineer, Cybersecurity RL (Reinforcement Learning) | San Francisco, CA | New York City, NY | San Francisco, CA
+ Anthropic | Research Engineer, Machine Learning (Reinforcement Learning) | London, UK | London, UK
+ Anthropic | Research Engineer, Machine Learning (Reinforcement Learning) | San Francisco, CA | New York City, NY | New York City, NY | 
+ Anthropic | Research Engineer / Performance Engineer, RL Distributed Systems | San Francisco, CA | New York City, NY | Seattle, WA | San Fr
+ Anthropic | Research Engineer, Post-Training Model Evaluations | San Francisco, CA | Seattle, WA | San Francisco, CA
+ Anthropic | Research Engineer, Pretraining | London, UK | London, UK
+ Anthropic | Research Engineer, Pretraining Scaling | San Francisco, CA | San Francisco, CA
+ Anthropic | Research Engineer, Pretraining Scaling - London | London, UK | London, UK
+ Anthropic | Research Engineer, Production Model Post-Training | San Francisco, CA | New York City, NY | Seattle, WA | New Yo
+ Anthropic | Research Engineer / Research Scientist, RL Frontiers | San Francisco, CA | New York City, NY | Seattle, WA | San Fr
+ Anthropic | Research Engineer / Research Scientist, Tokens | New York City, NY; New York City, NY | Seattle, WA; San Fran
+ Anthropic | Research Engineer, RL Engineering | San Francisco, CA | New York City, NY | Seattle, WA | San Fr
+ Anthropic | Research Engineer, RL Scaling Science | London, UK | London, UK
+ Anthropic | Research Engineer / Scientist, Alignment | San Francisco, CA | San Francisco, CA
+ Anthropic | Research Engineer, Visual Knowledge Work | New York City, NY; San Francisco, CA; Seattle, WA | San Fran
+ Anthropic | Research Scientist, Interpretability | San Francisco, CA | San Francisco, CA
+ Anthropic | Software Engineer, Research Infrastructure | San Francisco, CA | New York City, NY | San Francisco, CA
+ Anthropic | Software Engineer, Sandboxing | San Francisco, CA | New York City, NY | San Francisco, CA
+ Stripe | Software Engineer, Intern | Bengaluru | IN-Bengaluru
+ Cloudflare | Software Engineer | Hybrid | Remote India
+ Cloudflare | Software Engineer, AI Agents | In-Office | Remote India
+ Cloudflare | Software Engineer - Platforms & Productivity | In-Office | Remote India | Hybrid | Remote India
+ GitLab | Intermediate Backend Engineer, India | Bangalore, India
+ Together AI | AI Infrastructure System Engineer Bangalore | Bangalore, India | Remote
+
+UNCLEAR sample (first 12):
+ Anthropic | Applied AI Architect,  Beneficial Deployments (Life Sciences Community & Enablement) | San Francisco, CA | New York City, NY | San F | unclear: technical but off-centre role (SRE/security/archite
+ Anthropic | Applied AI Architect, Commercial | San Francisco, CA | New York City, NY | New Y | unclear: technical but off-centre role (SRE/security/archite
+ Anthropic | Applied AI Architect, Public Sector | Washington, DC | Washington, D.C. | unclear: technical but off-centre role (SRE/security/archite
+ Anthropic | Applied AI Architect, Startups | San Francisco, CA | New York City, NY | New Y | unclear: technical but off-centre role (SRE/security/archite
+ Anthropic | DevOps / AgentOps Engineer, GTM Systems | San Francisco, CA | San Francisco, CA | unclear: technical but off-centre role (SRE/security/archite
+ Anthropic | Product Engineer, Computer Use | San Francisco, CA | New York City, NY | Seatt | unclear: technical but off-centre role (SRE/security/archite
+ Anthropic | Research Engineer, Cybersecurity RL (Reinforcement Learning) | Zürich, CH | Zürich, CH | unclear: location not stated
+ Anthropic | Research Engineer, Production Model Post-Training | Zürich, CH | Zürich, CH | unclear: location not stated
+ Anthropic | Security Engineer, Corporate Security | San Francisco, CA | Seattle, WA | New York Ci | unclear: technical but off-centre role (SRE/security/archite
+ Anthropic | Security Engineer, Detection & Response | San Francisco, CA | New York City, NY | Seatt | unclear: technical but off-centre role (SRE/security/archite
+ Scale AI | AI Advisory Consultant | San Francisco, CA; New York, NY | San Francis | unclear: asks for 3+ years of experience
+ Scale AI | Applied AI Engineer, Global Public Sector | Doha, Qatar; London, UK | London, UK | unclear: asks for 2+ years of experience

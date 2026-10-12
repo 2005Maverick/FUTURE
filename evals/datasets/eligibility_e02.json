@@ -1,0 +1,17 @@
+[
+  {"id": "E02-01", "title": "Machine Learning Engineer", "location": "Bengaluru, India", "text": "Build ML systems. 1+ years of experience preferred.", "expect": "pass"},
+  {"id": "E02-02", "title": "Senior Machine Learning Engineer", "location": "Bengaluru, India", "text": "Lead ML.", "expect": "fail"},
+  {"id": "E02-03", "title": "Research Engineer", "location": "Remote-Friendly, United States", "text": "Research.", "expect": "fail"},
+  {"id": "E02-04", "title": "Software Engineer, ML", "location": "Remote - India", "text": "Work remotely.", "expect": "pass"},
+  {"id": "E02-05", "title": "Account Executive, Enterprise", "location": "Mumbai, India", "text": "Sell.", "expect": "fail"},
+  {"id": "E02-06", "title": "Applied Scientist", "location": "San Francisco, CA", "text": "We are unable to sponsor visas for this role.", "expect": "fail"},
+  {"id": "E02-07", "title": "Applied Scientist", "location": "London, UK", "text": "Visa sponsorship is available for this role.", "expect": "pass"},
+  {"id": "E02-08", "title": "Research Scientist", "location": "Toronto, Canada", "text": "Join our team.", "expect": "unclear"},
+  {"id": "E02-09", "title": "ML Engineer", "location": "Hyderabad, India", "text": "Requires 6+ years of industry experience.", "expect": "fail"},
+  {"id": "E02-10", "title": "Data Scientist", "location": "Pune, India", "text": "2-4 years of relevant experience.", "expect": "unclear"},
+  {"id": "E02-11", "title": "Research Scientist", "location": "Bengaluru, India", "text": "A PhD in CS is required for this role.", "expect": "fail"},
+  {"id": "E02-12", "title": "AI Research Intern", "location": "Remote", "text": "This is an unpaid internship.", "expect": "fail"},
+  {"id": "E02-13", "title": "AI Engineer", "location": "Remote", "text": "Work from anywhere. The company was founded 10 years ago.", "expect": "unclear"},
+  {"id": "E02-14", "title": "LLM Engineer", "location": "Remote (APAC)", "text": "Join us.", "expect": "pass"},
+  {"id": "E02-15", "title": "Machine Learning Engineer", "location": "New York, NY", "text": "Candidates must be authorized to work in the United States.", "expect": "fail"}
+]
