@@ -58,6 +58,7 @@ class _BoardCollector:
                 self.report.errors.append(f"{board}: {type(exc).__name__}: {str(exc)[:120]}")
                 continue
             self.report.units_ok += 1
+            self.report.ok_units.append(board)
             self.report.records += len(records)
             yield from records
 

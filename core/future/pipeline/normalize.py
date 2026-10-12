@@ -102,7 +102,8 @@ def from_greenhouse(raw: dict[str, Any]) -> Opportunity:
         countries=sorted(loc.countries), description=text, eligibility=elig,
         raw_hashes=[raw["content_hash"]],
         details={"departments": p.get("departments", []), "remote_scope": loc.remote_scope,
-                 "first_published": p.get("first_published")},
+                 "first_published": p.get("first_published"), "source": raw.get("source"),
+                 "board": p.get("board")},
     )
 
 

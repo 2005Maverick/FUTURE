@@ -42,6 +42,7 @@ class GreenhouseCollector:
                 self.report.errors.append(f"{board}: {type(exc).__name__}: {str(exc)[:120]}")
                 continue
             self.report.units_ok += 1
+            self.report.ok_units.append(board)
             for job in data.get("jobs", []):
                 record = self._to_record(board, job)
                 if record:

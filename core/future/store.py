@@ -52,8 +52,10 @@ class Store(Protocol):
     def get_evaluation(self, opp_id: str, rubric_version: str, input_hash: str) -> dict[str, Any] | None: ...
     def add_evaluation(self, opp_id: str, row: dict[str, Any]) -> None: ...
     def add_digest(self, for_date: dt.date, content_md: str) -> None: ...
+    def list_open_opportunities(self) -> list[dict[str, Any]]: ...
 
 
+OPEN_STATUSES = ("found", "verified", "scored", "shortlisted")
 OPP_INSERT_FIELDS = ("type", "track", "title", "org", "url", "canonical_url", "dedup_key", "location", "remote",
                      "countries", "deadline", "eligibility", "details", "status", "skip_reason")
 OPP_REFRESH_FIELDS = ("location", "details", "eligibility")   # safe to refresh on re-ingestion
@@ -107,6 +109,10 @@ class MemoryStore:
 
     def add_digest(self, for_date, content_md):
         self.digests[for_date.isoformat()] = content_md
+
+    def list_open_opportunities(self):
+        return [{"id": o["id"], "dedup_key": k, "details": o.get("details") or {}, "last_seen_at": o.get("last_seen_at")}
+                for k, o in self.opps.items() if o.get("status") in OPEN_STATUSES]
 
     def start_run(self, stage, agent, meta):
         run_id = str(uuid.uuid4())
@@ -249,6 +255,17 @@ class SupabaseStore:
     def add_digest(self, for_date, content_md):
         self._req("POST", "digests?on_conflict=for_date", json={"for_date": for_date.isoformat(), "content_md": content_md},
                   headers={"Prefer": "resolution=merge-duplicates"})
+
+    def list_open_opportunities(self, page: int = 1000):
+        out, offset = [], 0
+        statuses = ",".join(OPEN_STATUSES)
+        while True:
+            rows = self._req("GET", f"opportunities?select=id,dedup_key,details,last_seen_at&status=in.({statuses})"
+                                    f"&order=id&limit={page}&offset={offset}").json()
+            out += rows
+            if len(rows) < page:
+                return out
+            offset += page
 
     def update_source_health(self, source_id, health, yield_stats):
         self._req("PATCH", f"sources?id=eq.{source_id}", json={

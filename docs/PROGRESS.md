@@ -57,7 +57,8 @@
 | S03.01 | Lever/Ashby/Workable collectors (+SmartRecruiters) | done | collectors/ats.py, common payload shape → one normaliser; seeds: 32 Ashby AI boards (OpenAI, Sarvam, Physical Intelligence, Cohere, Perplexity…), Lever (Meesho, CRED), Workable (Hugging Face); 5 tests; live 9,502 postings all sources ok, +16 eligible from new sources (evals/results/G02/S03.01-live-multi-source.txt). SmartRecruiters → S03.02 (needs company ids). En-dash years gap fixed |
 | S03.02 | Company registry (Common Crawl → validate → India/remote-relevant boards) | doing | collectors/registry.py + weekly `registry` stage; collectors now read manual seeds ∪ registry picks; 5 tests; first live harvest running (slow: CDX 502 back-offs). TODO: progress logging |
 | S03.03 | Remote boards: Himalayas + Remotive | done | collectors/remote_boards.py; 4 tests; live: Himalayas 125 postings → 40 pass (remote-worldwide/India ML), Remotive 15 → 1 pass (evals/results/G02/S03.03-live-remote-boards.txt). SimplifyJobs deferred (US-auth internships, low value for him) |
-| S03.04–S03.07 | Liveness, near-dupes, labelling UI, E-03 | todo | S03.07 needs H5 |
+| S03.04 | Liveness | done | pipeline/liveness.py: full-feed boards (GH/Ashby/Lever/Workable) → absent from a board fetched OK today = expired; failed board/source never expires anything; search sources age out after 21 days; liveness stage in daily; 3 unit + 1 integration test. Live check on next daily run |
+| S03.05–S03.07 | Near-dupes, labelling UI, E-03 | todo | S03.07 needs H5 |
 | S04.01–S04.06 | Messy sources + Extractor | todo | S04.02 needs H1; S04.03 needs H3/H9 |
 | S05.01–S05.07 | Other tracks + Cartographer | todo | |
 | S06.01 | Master CV 2-page + 1-page | todo | can start any time |
@@ -87,3 +88,4 @@
 | 14 | 2026-10-12 | S02.06 dashboard v0 code + auth tests | build OK; private routes locked; deploy/data wait on H2/H11 | S03.01 Lever/Ashby/Workable/SmartRecruiters collectors (G02 display pending) |
 | 15 | 2026-10-12 | S03.01 Ashby/Lever/Workable collectors | 4 sources live, 9.5k postings, OpenAI/Sarvam roles surfaced; en-dash gap fixed | S03.02 company registry (YC/VC portfolios + Common Crawl) |
 | 16 | 2026-10-12 | S03.02 registry (live harvest in background) + S03.03 Himalayas/Remotive | +41 eligible remote roles; found & fixed local-state race (stages now serialised in local mode) | S03.02 finish + S03.04 liveness |
+| 17 | 2026-10-12 | S03.04 feed-presence liveness (registry harvest still running in background) | tests pass incl. 'failed board never expires' | S03.05 near-duplicate detection; registry results when done |

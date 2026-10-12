@@ -18,6 +18,7 @@ from future.llm import claude_runner
 from future.orchestrator.budget import BudgetExhausted, BudgetGuard
 from future.orchestrator.collect import SourceSpec, health_for
 from future.orchestrator.runlog import run_stage
+from future.pipeline import liveness
 from future.pipeline import normalize as norm
 from future.pipeline.ranking import RankInput, rank
 from future.store import Store
@@ -89,11 +90,22 @@ def run_daily(store: Store, plan: list[tuple[Collector, SourceSpec]], *, today: 
         ctx.items_in, ctx.items_out = len(records), new_raw
 
     with run_stage(store, "normalize") as ctx:
-        opps = norm.dedupe([NORMALIZERS[r.source]({"url": r.url, "content_hash": r.content_hash, "payload": r.payload})
+        opps = norm.dedupe([NORMALIZERS[r.source]({"url": r.url, "content_hash": r.content_hash,
+                                                   "payload": r.payload, "source": r.source})
                             for r in records if r.source in NORMALIZERS])
         ids = store.upsert_opportunities([opportunity_row(o) for o in opps])
         ctx.items_in, ctx.items_out = len(records), len(opps)
     counts = collections.Counter(o.eligibility.result for o in opps)
+
+    with run_stage(store, "liveness") as ctx:
+        ok_boards = {c.name: set(c.report.ok_units) for c, _ in plan}
+        open_rows = store.list_open_opportunities()
+        gone = liveness.expired_keys(open_rows, {o.dedup_key for o in opps}, ok_boards, today)
+        for opp_id, reason in gone:
+            store.update_opportunity(opp_id, {"status": "expired", "skip_reason": reason})
+        ctx.items_in, ctx.items_out = len(open_rows), len(gone)
+        if gone:
+            ctx.event("expired", f"{len(gone)} postings closed since last run", count=len(gone))
 
     evaluations: dict[str, dict] = {}
     by_key = {o.dedup_key: o for o in opps}
@@ -158,7 +170,8 @@ def run_daily(store: Store, plan: list[tuple[Collector, SourceSpec]], *, today: 
         eligible_unclear=counts["unclear"], skipped=counts["fail"], evaluated=evaluated_now,
         budget_used=budget.used, budget_cap=budget.cap, top_skip_reasons=reasons.most_common(4),
         source_health={c.name: health_for(c.report.success_rate) for c, _ in plan}))
-    md += (f"\n_Evaluations: {evaluated_now} new, {cached} cached, {pending} waiting for budget._\n")
+    md += (f"\n_Evaluations: {evaluated_now} new, {cached} cached, {pending} waiting for budget. "
+           f"Closed since last run: {len(gone)}._\n")
     store.add_digest(today, md)
     path = None
     if write_file:

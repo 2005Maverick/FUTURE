@@ -36,6 +36,7 @@ class CollectorReport:
     units_failed: int = 0
     records: int = 0
     errors: list[str] = field(default_factory=list)
+    ok_units: list[str] = field(default_factory=list)   # boards fetched successfully this run (liveness)
 
     @property
     def success_rate(self) -> float:

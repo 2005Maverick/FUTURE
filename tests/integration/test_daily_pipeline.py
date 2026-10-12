@@ -24,12 +24,14 @@ def job(jid, title, location, content="<p>Build ML systems with PyTorch.</p>"):
 class FakeCollector:
     name = "greenhouse"
 
-    def __init__(self, records):
+    def __init__(self, records, board_ok=True):
         self.records = records
+        self.board_ok = board_ok
         self.report = CollectorReport(source="greenhouse")
 
     def collect(self):
-        self.report = CollectorReport(source="greenhouse", units_ok=1, records=len(self.records))
+        self.report = CollectorReport(source="greenhouse", units_ok=1, records=len(self.records),
+                                      ok_units=["acme"] if self.board_ok else [])
         yield from self.records
 
 
@@ -119,6 +121,20 @@ def test_max_evals_cap(tmp_path):
     store, calls = LocalFileStore(tmp_path / "s.json"), []
     r = run(store, DATA, calls, max_evals=2)
     assert r.evaluated_now == 2 and r.pending == 1
+
+
+def test_closed_posting_expires_only_when_board_fetched_ok(tmp_path):
+    store, calls = LocalFileStore(tmp_path / "s.json"), []
+    run(store, DATA, calls)
+    ml_key = next(k for k, o in store.opps.items() if o["title"] == "Machine Learning Engineer")
+    # board fetch FAILED today and the job is absent → must stay open
+    daily.run_daily(store, [(FakeCollector(DATA[1:], board_ok=False), SPEC)], today=TODAY,
+                    runner=fake_runner(calls), write_file=False)
+    assert store.opps[ml_key]["status"] != "expired"
+    # board fetched OK and the job is absent → closed
+    daily.run_daily(store, [(FakeCollector(DATA[1:]), SPEC)], today=TODAY, runner=fake_runner(calls), write_file=False)
+    assert store.opps[ml_key]["status"] == "expired"
+    assert "no longer listed" in store.opps[ml_key]["skip_reason"]
 
 
 def test_advanced_status_is_not_reset_or_reevaluated(tmp_path):
