@@ -29,11 +29,11 @@
 | ST01.01.03 | Python package skeleton + pytest | done | pyproject.toml, core/future, .venv; pytest 17 passed |
 | ST01.01.04 | Pre-commit secret/PII scanner + E-10 | done | E-10 PASS: real hook blocks key/phone/private path, allows clean (evals/results/G01/E-10-and-scanner-tests.txt) |
 | ST01.01.05 | First commit + push | done | pushed to branch `dev` (rig_guard blocks pushes to main; Pranav merges dev→main via PR) |
-| ST01.02.01 | R1 headless Claude auth check | todo | |
+| ST01.02.01 | R1 headless Claude auth check | done | clean-env `claude -p` works via CLI login; ADR-001 |
 | ST01.02.02 | R1 unattended auth (Task Scheduler) | todo | may need H-tok |
-| ST01.02.03 | R1 models + agent JSON output | todo | |
-| ST01.02.04 | R1 usage capture → ledger | todo | |
-| ST01.02.05 | ADR-001 | todo | |
+| ST01.02.03 | R1 models + agent JSON output | done | claude_runner.py: haiku/sonnet 5.5 + --json-schema OK; lean flags ~1k vs ~17k tokens (evals/results/G01/R1-lean-calls.txt) |
+| ST01.02.04 | R1 usage capture → ledger | doing | usage parsed into ClaudeResult; DB ledger write pending ST01.03 |
+| ST01.02.05 | ADR-001 | done | docs/adr/001-headless-claude.md |
 | ST01.03.01 | Supabase project `future` | todo | check cost/limit first |
 | ST01.03.02 | Migration 0001 | todo | |
 | ST01.03.03 | RLS + sheet_view + anon-deny test | todo | HARD BLOCK |
@@ -66,3 +66,4 @@
 |---|---|---|---|---|
 | 0 | 2026-10-12 | Wrote DESIGN, ROADMAP, PROGRESS, LOOP | — | ST01.01.01 |
 | 1 | 2026-10-12 | S01.01 scaffold: git, CLAUDE.md, package, scanner+hook, E-10 | 17/17 tests pass; scan clean; pushed to dev | ST01.02.01 (R1 headless Claude) |
+| 2 | 2026-10-12 | R1 spike: headless Claude on subscription; lean runner; ADR-001 | works; overhead -94%; 22 tests pass | ST01.02.02 Task Scheduler, then ST01.03 Supabase |

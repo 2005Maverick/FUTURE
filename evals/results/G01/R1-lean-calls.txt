@@ -1,0 +1,2 @@
+haiku: model=claude-haiku-5-5 data={'ok': True, 'model_family': 'Claude'} in=2 cache_create=962 cache_read=0 out=77 total=1041 cost_usd=0.009244 t=3.83s
+sonnet: model=claude-sonnet-5-5 data={'ok': True, 'model_family': 'Claude'} in=2 cache_create=963 cache_read=0 out=77 total=1042 cost_usd=0.009252 t=4.06s
