@@ -1,0 +1,15 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.0, pytest-9.1.1, pluggy-1.6.0
+rootdir: D:\dev\personal\future
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collected 6 items
+
+tests\adversarial\test_e08_crash_resume.py ......                        [100%]
+
+============================== 6 passed in 4.59s ==============================
+.                                                                        [100%]
+.                                                                        [100%]
+.                                                                        [100%]
+.                                                                        [100%]
+.                                                                        [100%]
