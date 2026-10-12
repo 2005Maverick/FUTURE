@@ -61,7 +61,8 @@
 | S03.05 | Near-duplicate detection | done | pipeline/neardupe.py (rapidfuzz v1; embeddings upgrade when trijya-3 runs, H1). Audit v1 FALSELY merged 1,145 real roles (token_set_ratio subset=100) → v2: cross-source only, token_sort_ratio ≥90 on org + location-stripped title; real-data audit 0 false merges; 4 regression pairs from audit (evals/results/G02/S03.05-neardupe-audit.txt). Liveness sees merged-away keys as seen |
 | S03.06 | Labelling view | done | dashboard /label: BLIND labelling (Evaluator scores hidden to avoid anchoring), queue interleaved across apply/maybe/skip, yes/no + 1–5 + reason → labels table via owner RLS; lint+build OK. Usable once H11 (data) + H2/local run |
 | S03.07 | E-03 baseline: Pranav labels 40 | blocked:H5 | also needs H11 (evaluations must be in Supabase) |
-| S04.01–S04.06 | Messy sources + Extractor | todo | S04.02 needs H1; S04.03 needs H3/H9 |
+| S04.01 | Extractor agent + E-01 | doing | agent .claude/agents/extractor.md + agents/extractor.py: multi-record, every field needs a verbatim quote (code-verified, else null), URLs must appear in text, scam signals; jsonschema + 1 retry; Haiku 5.5 low effort; 8 tests. NEXT: build E-01 dataset (50 real messy texts: WhatsApp channels, pages) + Haiku baseline |
+| S04.02–S04.06 | Local model, inbox, WhatsApp pass, page watch, E-11 | todo | S04.02 needs H1; S04.03 needs H3/H9 |
 | S05.01–S05.07 | Other tracks + Cartographer | todo | |
 | S06.01 | Master CV 2-page + 1-page | todo | can start any time |
 | S06.02–S06.06 | Fact file, contacts, Writer, Critic, approvals | todo | S06.03 needs H4 |
@@ -94,3 +95,4 @@
 | 18 | 2026-10-12 | S03.05 near-dupes: audit caught 1,145 false merges in v1, fixed | 0 false merges on real data | S03.06 labelling UI (dashboard) |
 | 19 | 2026-10-12 | S03.06 blind labelling view | build OK | P04: S04.01 Extractor + E-01 dataset (registry harvest still running) |
 | 20 | 2026-10-12 | S03.02 registry results + selection quality fix | 300 boards auto-selected, gig aggregators excluded, target companies prioritised | live daily run with expanded boards |
+| 21 | 2026-10-12 | Registry progress log + S04.01 Extractor agent (code + guards) | 8 tests pass | E-01 dataset from real WhatsApp channel posts + pages |
