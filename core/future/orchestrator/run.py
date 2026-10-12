@@ -61,6 +61,19 @@ def stage_daily(store: Store, max_evals: int = 40) -> dict:
     return asdict(run_daily(store, jobs_plan(), today=dt.date.today(), max_evals=max_evals))
 
 
+def stage_tracks(store: Store) -> dict:
+    """Daily: hackathons/competitions + watched programme pages (changed pages → Extractor)."""
+    from dataclasses import asdict
+    from future.orchestrator.tracks import run_tracks, tracks_plan
+    return asdict(run_tracks(store, tracks_plan(), today=dt.date.today()))
+
+
+def stage_labs(store: Store) -> dict:
+    """Weekly: OpenAlex lab-outreach targets on Pranav's topics. No model calls."""
+    from future.orchestrator.tracks import run_labs
+    return run_labs(store, today=dt.date.today())
+
+
 def stage_healthcheck(store: Store) -> dict:
     """Cheap, model-free check of every dependency the pipeline needs."""
     with run_stage(store, "healthcheck") as ctx:
@@ -137,7 +150,7 @@ def stage_registry(store: Store) -> dict:
 
 
 STAGES = {"healthcheck": stage_healthcheck, "collect": stage_collect, "daily": stage_daily,
-          "registry": stage_registry}
+          "registry": stage_registry, "tracks": stage_tracks, "labs": stage_labs}
 
 
 def main(argv: list[str] | None = None) -> int:

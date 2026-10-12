@@ -52,7 +52,7 @@ def opportunity_row(o: norm.Opportunity) -> dict:
     fails = [r for r in o.eligibility.reasons if r.startswith("fail")]
     return {"type": o.type, "track": o.track, "title": o.title, "org": o.org, "url": o.url,
             "canonical_url": o.canonical_url, "dedup_key": o.dedup_key, "location": o.location,
-            "remote": o.remote, "countries": o.countries, "deadline": None,
+            "remote": o.remote, "countries": o.countries, "deadline": o.deadline,
             "eligibility": {"result": o.eligibility.result, "reasons": o.eligibility.reasons},
             # descriptions only for live candidates: skipped roles never reach a model, and storing
             # ~5k of them made the local state 41 MB (S02.05b)

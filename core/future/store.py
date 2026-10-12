@@ -111,7 +111,8 @@ class MemoryStore:
         self.digests[for_date.isoformat()] = content_md
 
     def list_open_opportunities(self):
-        return [{"id": o["id"], "dedup_key": k, "details": o.get("details") or {}, "last_seen_at": o.get("last_seen_at")}
+        return [{"id": o["id"], "dedup_key": k, "details": o.get("details") or {}, "last_seen_at": o.get("last_seen_at"),
+                 "deadline": o.get("deadline")}
                 for k, o in self.opps.items() if o.get("status") in OPEN_STATUSES]
 
     def start_run(self, stage, agent, meta):
@@ -260,7 +261,7 @@ class SupabaseStore:
         out, offset = [], 0
         statuses = ",".join(OPEN_STATUSES)
         while True:
-            rows = self._req("GET", f"opportunities?select=id,dedup_key,details,last_seen_at&status=in.({statuses})"
+            rows = self._req("GET", f"opportunities?select=id,dedup_key,details,last_seen_at,deadline&status=in.({statuses})"
                                     f"&order=id&limit={page}&offset={offset}").json()
             out += rows
             if len(rows) < page:

@@ -26,8 +26,10 @@ $Folder = '\FUTURE\'
 # name -> stage, daily time (IST = local laptop time)
 $Jobs = [ordered]@{
   'healthcheck' = @{ Stage = 'healthcheck'; At = '05:45' }
-  # Later stages are added here as they exist (collect 06:00, extract 06:30,
-  # evaluate 08:00, digest 09:00, whatsapp 13:00/19:00, inbox 21:00).
+  'daily'       = @{ Stage = 'daily';       At = '06:00' }
+  'tracks'      = @{ Stage = 'tracks';      At = '07:30' }
+  # Later: labs (weekly, needs a weekly trigger here), whatsapp 13:00/19:00, inbox 21:00.
+  # In local mode stages share one lock, so a stage that finds it held skips cleanly.
 }
 
 function Get-Selected { if ($Only) { $Jobs.GetEnumerator() | Where-Object Key -eq $Only } else { $Jobs.GetEnumerator() } }

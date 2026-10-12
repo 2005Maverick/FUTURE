@@ -25,3 +25,13 @@ def test_search_sources_only_age_out():
     stale = row("h2", "himalayas", "co2", last="2026-09-01")
     out = expired_keys([fresh, stale], set(), {"himalayas": {"anything"}}, TODAY)
     assert [o[0] for o in out] == ["id-h2"]
+
+
+def test_passed_deadline_expires_any_source():
+    r = {**row("k", "kaggle", "kaggle", last="2026-10-12"), "deadline": "2026-10-01"}
+    assert expired_keys([r], set(), {}, TODAY) == [("id-k", "deadline passed (2026-10-01)")]
+
+
+def test_watched_pages_and_labs_never_age_out_by_absence():
+    old = [row("p", "pagewatch", "eth-ssrf", last="2026-01-01"), row("l", "openalex", "openalex", last="2026-01-01")]
+    assert expired_keys(old, set(), {}, TODAY) == []

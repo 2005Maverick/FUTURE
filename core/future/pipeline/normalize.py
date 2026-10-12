@@ -76,6 +76,7 @@ class Opportunity:
     eligibility: Eligibility
     raw_hashes: list[str] = field(default_factory=list)
     details: dict[str, Any] = field(default_factory=dict)
+    deadline: str | None = None          # ISO date; non-job tracks (S05)
 
     @property
     def status(self) -> str:

@@ -8,6 +8,9 @@ a network error must not look like a closed posting.
 
 Search-style sources (Himalayas, Remotive) return query-dependent subsets, so
 absence proves nothing; those age out instead (`stale_after_days`).
+
+Any row whose deadline has passed is closed. Watched-page extractions and lab
+targets are not re-emitted while unchanged, so they never age out by absence.
 """
 from __future__ import annotations
 
@@ -15,6 +18,7 @@ import datetime as dt
 
 FULL_FEED_SOURCES = {"greenhouse", "ashby", "lever", "workable"}
 OPEN_STATUSES = ("found", "verified", "scored", "shortlisted")
+NO_AGE_OUT = {"pagewatch", "openalex"}
 
 
 def expired_keys(open_rows: list[dict], seen_keys: set[str], ok_boards: dict[str, set[str]],
@@ -26,7 +30,11 @@ def expired_keys(open_rows: list[dict], seen_keys: set[str], ok_boards: dict[str
             continue
         details = row.get("details") or {}
         source, board = details.get("source"), details.get("board")
-        if source in FULL_FEED_SOURCES:
+        if row.get("deadline") and row["deadline"][:10] < today.isoformat():
+            out.append((row["id"], f"deadline passed ({row['deadline'][:10]})"))
+        elif source in NO_AGE_OUT:
+            continue
+        elif source in FULL_FEED_SOURCES:
             if board in ok_boards.get(source, set()):
                 out.append((row["id"], f"no longer listed on {source}/{board}"))
         else:
