@@ -115,14 +115,19 @@ def stage_registry(store: Store) -> dict:
     from future.collectors import registry as reg
 
     client = reg.polite_client(timeout_s=60)
+    log = reg.ProgressLog(config.REPO_ROOT / "private" / "logs" / f"registry-{dt.date.today().isoformat()}.log")
     crawls = [c["id"] for c in httpx.get("https://index.commoncrawl.org/collinfo.json", timeout=60).json()[:2]]
+    log(f"start: crawls={crawls}")
     with run_stage(store, "registry") as ctx:
         pairs = []
         for ats in reg.URL_PATTERNS:
+            log(f"harvesting {ats}…")
             slugs = reg.harvest_slugs(ats, crawls, client)
+            log(f"harvested {ats}: {len(slugs)} slugs")
             ctx.event("harvested", f"{ats}: {len(slugs)} slugs", ats=ats, count=len(slugs))
             pairs += [(ats, s) for s in sorted(slugs)]
-        stats = reg.validate_all(pairs, client)
+        stats = reg.validate_all(pairs, client, progress=log)
+        log("done")
         reg.save_registry(stats)
         chosen = reg.selected(stats)
         ctx.items_in, ctx.items_out = len(pairs), sum(len(v) for v in chosen.values())

@@ -49,6 +49,15 @@ def test_validate_counts_relevant_india_ok_roles():
     assert (s.jobs, s.relevant, s.relevant_india_ok, s.error) == (4, 3, 2, None)
 
 
+def test_validate_all_reports_progress(tmp_path):
+    body = {"jobs": [{"title": "ML Engineer", "location": "Bengaluru"}]}
+    log = reg.ProgressLog(tmp_path / "p.log")
+    reg.validate_all([("ashby", f"s{i}") for i in range(5)], mock_client({"job-board/": (200, body)}),
+                     progress=log, every=2)
+    assert [l.split(" ", 1)[1] for l in (tmp_path / "p.log").read_text().splitlines()] == \
+        ["validated 2/5", "validated 4/5", "validated 5/5"]
+
+
 def test_validate_records_http_errors():
     s = reg.validate("lever", "gone", mock_client({}))
     assert s.error == "http 404" and s.jobs == 0

@@ -131,9 +131,29 @@ def validate(ats: str, slug: str, client: httpx.Client) -> BoardStats:
     return BoardStats(ats, slug, len(jobs), len(relevant), india_ok, now)
 
 
-def validate_all(pairs: list[tuple[str, str]], client: httpx.Client, workers: int = 4) -> list[BoardStats]:
+def validate_all(pairs: list[tuple[str, str]], client: httpx.Client, workers: int = 4,
+                 progress=lambda msg: None, every: int = 250) -> list[BoardStats]:
+    out: list[BoardStats] = []
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        return list(pool.map(lambda p: validate(p[0], p[1], client), pairs))
+        for i, stat in enumerate(pool.map(lambda p: validate(p[0], p[1], client), pairs), start=1):
+            out.append(stat)
+            if i % every == 0 or i == len(pairs):
+                progress(f"validated {i}/{len(pairs)}")
+    return out
+
+
+class ProgressLog:
+    """Append-only progress file so long stages are observable while running
+    (the first registry harvest ran 31 min with no visibility)."""
+
+    def __init__(self, path: Path) -> None:
+        self.path = Path(path)
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+
+    def __call__(self, msg: str) -> None:
+        stamp = dt.datetime.now().strftime("%H:%M:%S")
+        with open(self.path, "a", encoding="utf-8") as fh:
+            fh.write(f"{stamp} {msg}\n")
 
 
 # First live harvest (2026-10-12): the top boards by raw count were data-labelling gig
