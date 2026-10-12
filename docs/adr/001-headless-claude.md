@@ -17,10 +17,17 @@
    `--system-prompt <own> --tools "" --strict-mcp-config --setting-sources "" --disable-slash-commands --no-session-persistence`
 5. `--json-schema` gives schema-conforming structured output (tested with Haiku 5.5 and Sonnet 5.5).
 
+6. **`--json-schema` costs about 3 conversation turns per call** (S02.03, 2026-10-12). A real Evaluator call came to ~13.4k
+   tokens with the flag and **~6.0k without it** (same verdict). The flag re-sends the context for its structured-output
+   round trips. `--effort low` vs `medium` changed tokens by under 2%; there were no hidden thinking tokens. Medium judged
+   better on 1 of 2 test postings. Evidence: `evals/results/G02/S02.03-effort-comparison.txt`.
+
 ## Decision
 - All model calls go through `core/future/llm/claude_runner.py` using the lean flags.
 - Agent instructions are passed as `--system-prompt`, built from `.claude/agents/*.md`, rather than relying on settings discovery.
 - The runner refuses to start if `ANTHROPIC_API_KEY` is set.
+- Agents ask for **plain single-turn JSON** (schema in the system prompt) and validate it locally with `jsonschema`, with
+  one repair retry. Don't use `--json-schema` in the pipeline. Default `--effort medium`.
 
 ## Open
 - ST01.02.02 PASSED: a Task Scheduler task (user logged on; `scripts/run_probe.cmd` → `scheduler_probe.py`) ran with no

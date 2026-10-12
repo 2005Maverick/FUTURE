@@ -28,6 +28,10 @@ def test_years_parsing():
     assert max_years_required("5+ years of industry experience") == 5
     assert max_years_required("3-5 yrs' experience") == 3
     assert max_years_required("founded 10 years ago") is None
+    # live Cloudflare formats the first version missed (cost ~15k tokens each at the model)
+    assert max_years_required("Exp: 3-15yrs") == 3
+    assert max_years_required("Exp : 3- 12 yrs") == 3
+    assert max_years_required("Exp: 5 - 10yrs") == 5
 
 
 def test_remote_scope():

@@ -1,0 +1,14 @@
+Stripe | Software Engineer, Intern | effort=low: total=13357 in=4 cc=2951 cr=9045 out=1357 thinking=0 -> fit=3 elig=unclear rec=maybe
+Stripe | Software Engineer, Intern | effort=medium: total=13423 in=4 cc=913 cr=11097 out=1409 thinking=0 -> fit=3 elig=unclear rec=maybe
+GitLab | Intermediate Backend Engineer, India | effort=low: total=14126 in=4 cc=887 cr=11949 out=1286 thinking=0 -> fit=2 elig=unclear rec=skip
+GitLab | Intermediate Backend Engineer, India | effort=medium: total=14333 in=4 cc=917 cr=11949 out=1463 thinking=0 -> fit=3 elig=unclear rec=maybe
+system prompt chars: 6206
+tiny user: in=2 cc=3851 cr=0 out=1010 total=4863
+7000-char user: in=2 cc=3950 cr=3392 out=938 total=8282
+baseline tiny no-schema: in=425 cc=0 cr=0 total=429
+num_turns: 3 | iterations: 1
+  iter0: in=2 cc=524 cr=5653 out=933 type=message
+one_line length: 190
+NO-SCHEMA-FLAG: turns=1 in=2 cc=5241 cr=0 out=792 total=6035
+parsed ok: True | keys: ['eligibility', 'eligibility_reason', 'evidence', 'fit', 'gaps', 'legitimacy', 'legitimacy_signal', 'one_line', 'recommendation', 'value']
+fit=3 elig=unclear rec=maybe one_line_len=182

@@ -1,0 +1,16 @@
+3/4 maybe elig=pass    tok=14669 Stripe | Software Engineer, Intern | flags=[]
+1/3 skip  elig=fail    tok=15443 Cloudflare | Software Engineer | flags=[]
+2/3 skip  elig=fail    tok=16848 Cloudflare | Software Engineer, AI Agents | flags=[]
+2/3 skip  elig=fail    tok=15411 Cloudflare | Software Engineer - Platforms & Productivity | flags=[]
+3/3 maybe elig=unclear tok=15204 GitLab | Intermediate Backend Engineer, India | flags=[]
+2/4 skip  elig=unclear tok=12760 Together AI | AI Infrastructure System Engineer Bangalore | flags=['dropped 1 non-verbatim quote(s)']
+2/5 skip  elig=unclear tok=15581 Anthropic | Applied AI Engineer, Beneficial Deployments (Life Scien | flags=[]
+2/4 skip  elig=unclear tok=15390 Anthropic | Data Engineer, Product | flags=[]
+2/4 skip  elig=unclear tok=24588 Anthropic | Applied AI Architect,  Beneficial Deployments (Life Sci | flags=[]
+1/2 skip  elig=fail    tok=13177 Databricks | Solutions Architect - Public Sector (SLED) | flags=[]
+3/4 maybe elig=unclear tok=14914 Stripe | Software Engineer, Intern (Summer or Winter) | flags=[]
+2/3 skip  elig=unclear tok=14870 Cloudflare | Software Engineer, Network Performance & Reliability (A | flags=[]
+
+DONE n=12 total_tokens=188855 avg=15737 budget_used=188855
+recs: Counter({'skip': 9, 'maybe': 3})
+quotes kept: 65 dropped: 1

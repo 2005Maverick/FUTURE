@@ -78,7 +78,8 @@ def claude_executable() -> str:
     return exe
 
 
-def build_command(prompt: str, model: str, system_prompt: str, json_schema: dict | None) -> list[str]:
+def build_command(prompt: str, model: str, system_prompt: str, json_schema: dict | None,
+                  effort: str | None = None) -> list[str]:
     cmd = [
         claude_executable(), "-p", prompt,
         "--output-format", "json",
@@ -92,12 +93,14 @@ def build_command(prompt: str, model: str, system_prompt: str, json_schema: dict
     ]
     if json_schema is not None:
         cmd += ["--json-schema", json.dumps(json_schema)]
+    if effort is not None:
+        cmd += ["--effort", effort]
     return cmd
 
 
-def run(prompt: str, *, model: str = "haiku", system_prompt: str,
-        json_schema: dict | None = None, timeout_s: int = 300, cwd: str | None = None) -> ClaudeResult:
-    cmd = build_command(prompt, model, system_prompt, json_schema)
+def run(prompt: str, *, model: str = "haiku", system_prompt: str, json_schema: dict | None = None,
+        timeout_s: int = 300, cwd: str | None = None, effort: str | None = None) -> ClaudeResult:
+    cmd = build_command(prompt, model, system_prompt, json_schema, effort)
     started = time.monotonic()
     proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8",
                           env=clean_env(), timeout=timeout_s, cwd=cwd)
