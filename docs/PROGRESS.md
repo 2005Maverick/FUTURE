@@ -43,9 +43,9 @@
 | ST01.04.02 | Idempotent stage runner + lock (E-08) | done | E-08 PASS: real kill mid-run → resume, 0 lost, ≤1 item repeated; 5/5 repeat runs pass; stale-lock + exclusive-lock tests (evals/results/G01/E-08-crash-resume.txt) |
 | ST01.04.03 | Budget guard (E-09) | done | E-09 PASS: cap, urgent reserve, IST day reset (evals/results/G01/ST01.04-runlog-budget-E09.txt); cap 300k/day PROVISIONAL until S08.04 |
 | ST01.04.04 | trijya probe + queue policy | done | orchestrator/trijya.py; 6 tests; live probe: awake, services not yet installed → WAIT (evals/results/G01/ST01.04.04-trijya-live-probe.txt) |
-| ST01.04.05 | Task Scheduler registration | todo | |
+| ST01.04.05 | Task Scheduler registration | done | scripts/task_scheduler.ps1 (jobs created DISABLED); live: register→fire→exit 0x0→removed; run.py healthcheck stage |
 | ST01.05.* | trijya-3 Docker/Ollama/SearXNG/Crawl4AI | blocked:H1 | |
-| G01 | Gate | todo | |
+| G01 | Gate | done (PASS WITH RISK) | evals/results/G01/GATE-G01.md; risks: H11 (live DB writes), H1 (trijya base) |
 | S02.01 | Greenhouse collector (30-company seed) | todo | |
 | S02.02 | Normaliser + dedup + eligibility v1 (E-02 subset) | todo | |
 | S02.03 | Evaluator v1 (jobs rubric) | todo | |
@@ -73,3 +73,4 @@
 | 5 | 2026-10-12 | ST01.04.01 run log + ST01.04.03 budget guard behind a Store interface | 13 new tests pass (E-09 PASS) | ST01.04.02 idempotent stage runner + lock (E-08) |
 | 6 | 2026-10-12 | ST01.04.02 resumable stages (durable progress ledger) + single-instance lock | E-08 PASS (real process kill, 5/5 stable) | ST01.04.04 trijya-3 probe + queue policy |
 | 7 | 2026-10-12 | ST01.04.04 trijya-3 probe + run/wait/fallback policy | 6 tests pass; live probe correct | ST01.04.05 Task Scheduler registration script |
+| 8 | 2026-10-12 | ST01.04.05 scheduler script + healthcheck stage; G01 gate | G01 PASS WITH RISK | P02: S02.01 Greenhouse collector |
