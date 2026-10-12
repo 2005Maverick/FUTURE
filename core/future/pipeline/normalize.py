@@ -89,7 +89,7 @@ def from_ats(raw: dict[str, Any]) -> Opportunity:
 
 def from_greenhouse(raw: dict[str, Any]) -> Opportunity:
     p = raw["payload"]
-    org = ORG_NAMES.get(p["board"], p["board"].replace("-", " ").title())
+    org = p.get("org") or ORG_NAMES.get(p["board"], p["board"].replace("-", " ").title())
     loc = parse_location(p.get("location", ""), *p.get("offices", []))
     text = html_to_text(p.get("content_html", ""))[:MAX_DESC]
     elig = check_job(p["title"], loc, text)

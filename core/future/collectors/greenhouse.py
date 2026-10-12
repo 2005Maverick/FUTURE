@@ -22,7 +22,10 @@ class GreenhouseCollector:
 
     def __init__(self, boards: list[str] | None = None, client: httpx.Client | None = None,
                  delay_s: float = 0.5, sleep=time.sleep) -> None:
-        self.boards = boards if boards is not None else read_seeds("greenhouse.txt")
+        if boards is None:
+            from future.collectors.registry import seeds_for   # manual seeds ∪ registry-selected boards
+            boards = seeds_for(SOURCE)
+        self.boards = boards
         self._client = client or polite_client()
         self._delay_s = delay_s
         self._sleep = sleep

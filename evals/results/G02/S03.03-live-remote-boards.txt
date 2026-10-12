@@ -1,0 +1,9 @@
+himalayas: units_ok=21 failed=0 records=125 -> opps=118 {'pass': 40, 'unclear': 20, 'fail': 58}
+   PASS micro1 | Machine Learning Engineer | Remote - Worldwide
+   PASS Your Personal AI | Machine Learning Engineer | Remote - Worldwide
+   PASS Aidaptive | Machine Learning Engineer | Remote - India
+   PASS EVB | Machine Learning Engineer | Remote - Worldwide
+   PASS Xperteez Technology | Machine Learning Engineer | Remote - Contract | Remote - Worldwide
+   PASS Spotter Labs | Remote Machine Learning Engineer | Remote - Worldwide
+remotive: units_ok=2 failed=0 records=15 -> opps=15 {'fail': 14, 'pass': 1}
+   PASS CodeForAI | Software Engineer / AI Code Trainer (Python, Web, Full Stack) | Remote - USA, UK, India, Australia, Irel

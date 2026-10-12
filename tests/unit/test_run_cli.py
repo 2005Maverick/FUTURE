@@ -17,6 +17,17 @@ def test_healthcheck_records_run_and_reports(monkeypatch, tmp_path, capsys):
     assert (tmp_path / "runs.jsonl").exists()
 
 
+def test_local_backend_serialises_different_stages(monkeypatch, tmp_path, capsys):
+    """Two DIFFERENT stages on the local JSON store must not overlap (last-writer-wins data loss)."""
+    from future.orchestrator.stages import InstanceLock
+    monkeypatch.setattr(run, "make_store", lambda: (MemoryStore(), "local"))
+    monkeypatch.setattr(run, "LOCK_DIR", tmp_path / "locks")
+    monkeypatch.setattr(run, "LOCAL_LOG", tmp_path / "runs.jsonl")
+    with InstanceLock(tmp_path / "locks" / "local-state.lock"):     # e.g. registry running
+        assert run.main(["--stage", "healthcheck"]) == 0             # a different stage
+    assert "skip:" in capsys.readouterr().out
+
+
 def test_concurrent_run_is_skipped_cleanly(monkeypatch, tmp_path, capsys):
     from future.orchestrator.stages import InstanceLock
     monkeypatch.setattr(run, "make_store", lambda: (MemoryStore(), "memory"))

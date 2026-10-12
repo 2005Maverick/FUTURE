@@ -38,6 +38,7 @@ def jobs_plan():
     """All job-board collectors (public APIs, no auth; terms allow automated reads of public boards)."""
     from future.collectors.ats import AshbyCollector, LeverCollector, WorkableCollector
     from future.collectors.greenhouse import GreenhouseCollector
+    from future.collectors.remote_boards import HimalayasCollector, RemotiveCollector
     from future.orchestrator.collect import SourceSpec
 
     def spec(method, url):
@@ -47,6 +48,10 @@ def jobs_plan():
         (AshbyCollector(), spec("ashby_posting_api", "https://api.ashbyhq.com/posting-api")),
         (LeverCollector(), spec("lever_postings_api", "https://api.lever.co/v0/postings")),
         (WorkableCollector(), spec("workable_widget_api", "https://apply.workable.com/api")),
+        (HimalayasCollector(), SourceSpec(kind="api", track="job", method="himalayas_search_api",
+                                          url="https://himalayas.app/jobs/api", terms_verdict="allowed")),
+        (RemotiveCollector(), SourceSpec(kind="api", track="job", method="remotive_api_2_calls_per_run",
+                                         url="https://remotive.com/api/remote-jobs", terms_verdict="allowed")),
     ]
 
 
@@ -104,7 +109,30 @@ def dump_local_raw(store: Store, stage: str) -> Path | None:
     return out
 
 
-STAGES = {"healthcheck": stage_healthcheck, "collect": stage_collect, "daily": stage_daily}
+def stage_registry(store: Store) -> dict:
+    """Weekly: discover ATS boards from Common Crawl, validate, keep India/remote-relevant ones. No model calls."""
+    import httpx
+    from future.collectors import registry as reg
+
+    client = reg.polite_client(timeout_s=60)
+    crawls = [c["id"] for c in httpx.get("https://index.commoncrawl.org/collinfo.json", timeout=60).json()[:2]]
+    with run_stage(store, "registry") as ctx:
+        pairs = []
+        for ats in reg.URL_PATTERNS:
+            slugs = reg.harvest_slugs(ats, crawls, client)
+            ctx.event("harvested", f"{ats}: {len(slugs)} slugs", ats=ats, count=len(slugs))
+            pairs += [(ats, s) for s in sorted(slugs)]
+        stats = reg.validate_all(pairs, client)
+        reg.save_registry(stats)
+        chosen = reg.selected(stats)
+        ctx.items_in, ctx.items_out = len(pairs), sum(len(v) for v in chosen.values())
+    return {"crawls": crawls, "harvested": len(pairs),
+            "live_boards": sum(1 for s in stats if s.error is None and s.jobs > 0),
+            "selected": {k: len(v) for k, v in chosen.items()}}
+
+
+STAGES = {"healthcheck": stage_healthcheck, "collect": stage_collect, "daily": stage_daily,
+          "registry": stage_registry}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -114,8 +142,11 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     store, backend = make_store()
     kwargs = {"max_evals": args.max_evals} if args.stage == "daily" and args.max_evals is not None else {}
+    # With the local JSON store, two stages loading then saving the same file would
+    # silently overwrite each other (last writer wins), so local mode is one-stage-at-a-time.
+    lock_name = "local-state" if backend == "local" else args.stage
     try:
-        with InstanceLock(LOCK_DIR / f"{args.stage}.lock"):
+        with InstanceLock(LOCK_DIR / f"{lock_name}.lock"):
             try:
                 result = STAGES[args.stage](store, **kwargs)
             finally:
