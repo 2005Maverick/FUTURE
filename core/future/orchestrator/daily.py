@@ -20,6 +20,7 @@ from future.orchestrator.collect import SourceSpec, health_for
 from future.orchestrator.runlog import run_stage
 from future.pipeline import liveness
 from future.pipeline import normalize as norm
+from future.pipeline.neardupe import merge_near_duplicates
 from future.pipeline.ranking import RankInput, rank
 from future.store import Store
 
@@ -90,17 +91,21 @@ def run_daily(store: Store, plan: list[tuple[Collector, SourceSpec]], *, today: 
         ctx.items_in, ctx.items_out = len(records), new_raw
 
     with run_stage(store, "normalize") as ctx:
-        opps = norm.dedupe([NORMALIZERS[r.source]({"url": r.url, "content_hash": r.content_hash,
-                                                   "payload": r.payload, "source": r.source})
-                            for r in records if r.source in NORMALIZERS])
+        exact = norm.dedupe([NORMALIZERS[r.source]({"url": r.url, "content_hash": r.content_hash,
+                                                    "payload": r.payload, "source": r.source})
+                             for r in records if r.source in NORMALIZERS])
+        opps, near = merge_near_duplicates(exact)
+        seen_today = {o.dedup_key for o in exact}   # incl. merged-away keys: they are not "closed"
         ids = store.upsert_opportunities([opportunity_row(o) for o in opps])
         ctx.items_in, ctx.items_out = len(records), len(opps)
+        if near:
+            ctx.event("near_duplicates", f"{len(near)} cross-source near-duplicates merged", examples=near[:5])
     counts = collections.Counter(o.eligibility.result for o in opps)
 
     with run_stage(store, "liveness") as ctx:
         ok_boards = {c.name: set(c.report.ok_units) for c, _ in plan}
         open_rows = store.list_open_opportunities()
-        gone = liveness.expired_keys(open_rows, {o.dedup_key for o in opps}, ok_boards, today)
+        gone = liveness.expired_keys(open_rows, seen_today, ok_boards, today)
         for opp_id, reason in gone:
             store.update_opportunity(opp_id, {"status": "expired", "skip_reason": reason})
         ctx.items_in, ctx.items_out = len(open_rows), len(gone)
