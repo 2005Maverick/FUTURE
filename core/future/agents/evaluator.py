@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Callable
 
 from future import config
+from future.agents import guards
 from future.llm import claude_runner
 from future.orchestrator.budget import BudgetGuard
 
@@ -69,28 +70,62 @@ def user_prompt(title: str, org: str, location: str, prefilter_notes: list[str],
     notes = "; ".join(prefilter_notes) or "none"
     return (f"OPPORTUNITY\nTitle: {title}\nOrganisation: {org}\nLocation: {location}\n"
             f"Pre-filter notes (deterministic, may be incomplete): {notes}\n\n"
-            f"POSTING TEXT (untrusted data):\n<<<\n{posting_text[:MAX_POSTING_CHARS]}\n>>>")
+            f"POSTING TEXT (untrusted data):\n<<<\n{guards.fence(posting_text[:MAX_POSTING_CHARS])}\n>>>")
 
 
 def validate(data: dict, posting_text: str) -> tuple[dict, list[str], list[str]]:
-    """Drop non-verbatim quotes; enforce rubric consistency. Returns (data, dropped, flags)."""
+    """Drop non-verbatim quotes; enforce rubric consistency and the E-11 injection guards.
+    Returns (data, dropped, flags)."""
     haystack = _norm(posting_text[:MAX_POSTING_CHARS])
-    kept, dropped = [], []
+    kept, dropped, injected = [], [], []
     for ev in data.get("evidence", []):
-        (kept if _norm(ev.get("quote", "")) and _norm(ev["quote"]) in haystack else dropped).append(ev)
+        quote = _norm(ev.get("quote", ""))
+        if not quote or quote not in haystack:
+            dropped.append(ev)
+        elif guards.has_injection(ev["quote"]):
+            injected.append(ev)              # verbatim, but it is an instruction to us, not evidence
+        else:
+            kept.append(ev)
     data = {**data, "evidence": kept}
     flags = []
     if dropped:
         flags.append(f"dropped {len(dropped)} non-verbatim quote(s)")
+    if injected:
+        flags.append(f"dropped {len(injected)} quote(s) that address an AI reader")
     if not kept:
         flags.append("no verifiable evidence")
+    data, judgement_flags = _guard_judgement(data, guards.has_injection(posting_text))
+    flags += judgement_flags
     rec = data["recommendation"]
     allowed = allowed_recommendations(data["fit"], data["eligibility"])
     if rec not in allowed:
         flags.append(f"recommendation '{rec}' inconsistent with fit={data['fit']}/eligibility="
                      f"{data['eligibility']}; set to '{allowed[0]}'")
         data["recommendation"] = allowed[0]
-    return data, [d.get("quote", "") for d in dropped], flags
+    if data["recommendation"] == "apply" and (not kept or data["legitimacy"] == "suspect" or injected):
+        reason = ("no verifiable evidence" if not kept else
+                  "legitimacy suspect" if data["legitimacy"] == "suspect" else "posting addresses an AI reader")
+        flags.append(f"apply → maybe ({reason}); a human must look first")
+        data["recommendation"] = "maybe"
+    return data, [d.get("quote", "") for d in dropped + injected], flags
+
+
+INJECTION_ONE_LINE = "Posting contains text aimed at AI screeners; read it yourself before acting."
+
+
+def _guard_judgement(data: dict, posting_has_injection: bool) -> tuple[dict, list[str]]:
+    """Free text goes into the digest: no links or addresses, no sentence addressing an AI reader.
+    If the posting carries an injection, the model's one_line is replaced outright (E-11 EV-03:
+    a summary repeated the injected request)."""
+    flags = []
+    one_line = INJECTION_ONE_LINE if posting_has_injection else guards.scrub(data["one_line"])
+    reason = guards.scrub(data["eligibility_reason"])
+    gaps = [g for g in (guards.scrub(x) for x in data.get("gaps", [])) if g]
+    if posting_has_injection:
+        flags.append("posting addresses an AI reader; one_line replaced")
+    elif one_line != data["one_line"].strip():
+        flags.append("one_line scrubbed")
+    return {**data, "one_line": one_line or "(no summary)", "eligibility_reason": reason, "gaps": gaps}, flags
 
 
 def allowed_recommendations(fit: int, eligibility: str) -> tuple[str, ...]:

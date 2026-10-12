@@ -15,6 +15,7 @@ from typing import Callable
 import jsonschema
 
 from future import config
+from future.agents import guards
 from future.llm import claude_runner
 from future.orchestrator.budget import BudgetGuard
 
@@ -99,7 +100,7 @@ def extract(text: str, *, source: str, today: dt.date, guard: BudgetGuard | None
             run_id: str | None = None, runner: Callable = claude_runner.run, model: str = "haiku",
             effort: str = "low") -> Extraction:
     sys_p = system_prompt()
-    base = f"TODAY: {today.isoformat()}\nSOURCE: {source}\n\nTEXT (untrusted data):\n<<<\n{text[:MAX_TEXT_CHARS]}\n>>>"
+    base = f"TODAY: {today.isoformat()}\nSOURCE: {source}\n\nTEXT (untrusted data):\n<<<\n{guards.fence(text[:MAX_TEXT_CHARS])}\n>>>"
     tokens, flags, errors = 0, [], []
     data: object = None
     model_used = model
