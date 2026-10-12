@@ -39,9 +39,9 @@
 | ST01.03.02 | Migration 0001 | done | db/migrations/0001_init.sql + 0002_private_is_owner.sql applied; 17 tables |
 | ST01.03.03 | RLS + sheet_view + anon-deny test | done | RLS on 17/17; security advisor 0 lints; anon read/write/RPC denied 11/11 (evals/results/G01/ST01.03.03-rls-anon-denied.txt) |
 | ST01.03.04 | db.py + round-trip test | blocked:H11 | needs SUPABASE_SECRET_KEY in .env |
-| ST01.04.01 | runs/events writer | todo | |
+| ST01.04.01 | runs/events writer | done | store.py (Store/MemoryStore/SupabaseStore) + orchestrator/runlog.py; tests pass; live writes activate with H11 |
 | ST01.04.02 | Idempotent stage runner + lock (E-08) | todo | |
-| ST01.04.03 | Budget guard (E-09) | todo | |
+| ST01.04.03 | Budget guard (E-09) | done | E-09 PASS: cap, urgent reserve, IST day reset (evals/results/G01/ST01.04-runlog-budget-E09.txt); cap 300k/day PROVISIONAL until S08.04 |
 | ST01.04.04 | trijya probe + queue policy | todo | |
 | ST01.04.05 | Task Scheduler registration | todo | |
 | ST01.05.* | trijya-3 Docker/Ollama/SearXNG/Crawl4AI | blocked:H1 | |
@@ -70,3 +70,4 @@
 | 2 | 2026-10-12 | R1 spike: headless Claude on subscription; lean runner; ADR-001 | works; overhead -94%; 22 tests pass | ST01.02.02 Task Scheduler, then ST01.03 Supabase |
 | 3 | 2026-10-12 | ST01.02.02 Task Scheduler unattended Claude call | PASS (411 tokens, haiku-5-5); temp task deleted | ST01.03 Supabase project + schema |
 | 4 | 2026-10-12 | S01.03 Supabase: project, schema, RLS, advisor fix, anon-deny tests | PASS (HARD BLOCK gate cleared); db.py waits on H11 | ST01.04 orchestrator core (local, no DB writes until H11) |
+| 5 | 2026-10-12 | ST01.04.01 run log + ST01.04.03 budget guard behind a Store interface | 13 new tests pass (E-09 PASS) | ST01.04.02 idempotent stage runner + lock (E-08) |
