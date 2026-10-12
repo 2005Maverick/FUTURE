@@ -1,0 +1,10 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.0, pytest-9.1.1, pluggy-1.6.0
+rootdir: D:\dev\personal\future
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collected 11 items
+
+tests\integration\test_rls_anon_denied.py ...........                    [100%]
+
+============================= 11 passed in 2.49s ==============================

@@ -18,6 +18,7 @@
 | H8 | Semantic Scholar key | waiting (optional) |
 | H9 | Job-alert sign-ups | waiting |
 | H10 | DESIGN §11 overrides | defaults apply |
+| H11 | Copy Supabase **secret key** (Dashboard → project `future` → Settings → API Keys → Secret) into `.env` as `SUPABASE_SECRET_KEY=` | waiting |
 | H-tok | Run `claude setup-token` once if unattended auth needs it (ST01.02.02) | not needed (CLI login works unattended) |
 
 ## Task ledger
@@ -34,10 +35,10 @@
 | ST01.02.03 | R1 models + agent JSON output | done | claude_runner.py: haiku/sonnet 5.5 + --json-schema OK; lean flags ~1k vs ~17k tokens (evals/results/G01/R1-lean-calls.txt) |
 | ST01.02.04 | R1 usage capture → ledger | doing | usage parsed into ClaudeResult; DB ledger write pending ST01.03 |
 | ST01.02.05 | ADR-001 | done | docs/adr/001-headless-claude.md |
-| ST01.03.01 | Supabase project `future` | todo | check cost/limit first |
-| ST01.03.02 | Migration 0001 | todo | |
-| ST01.03.03 | RLS + sheet_view + anon-deny test | todo | HARD BLOCK |
-| ST01.03.04 | db.py + round-trip test | todo | |
+| ST01.03.01 | Supabase project `future` | done | $0/mo confirmed; ACTIVE_HEALTHY, ap-south-1 (id in private/infra.md) |
+| ST01.03.02 | Migration 0001 | done | db/migrations/0001_init.sql + 0002_private_is_owner.sql applied; 17 tables |
+| ST01.03.03 | RLS + sheet_view + anon-deny test | done | RLS on 17/17; security advisor 0 lints; anon read/write/RPC denied 11/11 (evals/results/G01/ST01.03.03-rls-anon-denied.txt) |
+| ST01.03.04 | db.py + round-trip test | blocked:H11 | needs SUPABASE_SECRET_KEY in .env |
 | ST01.04.01 | runs/events writer | todo | |
 | ST01.04.02 | Idempotent stage runner + lock (E-08) | todo | |
 | ST01.04.03 | Budget guard (E-09) | todo | |
@@ -68,3 +69,4 @@
 | 1 | 2026-10-12 | S01.01 scaffold: git, CLAUDE.md, package, scanner+hook, E-10 | 17/17 tests pass; scan clean; pushed to dev | ST01.02.01 (R1 headless Claude) |
 | 2 | 2026-10-12 | R1 spike: headless Claude on subscription; lean runner; ADR-001 | works; overhead -94%; 22 tests pass | ST01.02.02 Task Scheduler, then ST01.03 Supabase |
 | 3 | 2026-10-12 | ST01.02.02 Task Scheduler unattended Claude call | PASS (411 tokens, haiku-5-5); temp task deleted | ST01.03 Supabase project + schema |
+| 4 | 2026-10-12 | S01.03 Supabase: project, schema, RLS, advisor fix, anon-deny tests | PASS (HARD BLOCK gate cleared); db.py waits on H11 | ST01.04 orchestrator core (local, no DB writes until H11) |
