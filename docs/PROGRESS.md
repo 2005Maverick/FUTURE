@@ -59,7 +59,8 @@
 | S03.03 | Remote boards: Himalayas + Remotive | done | collectors/remote_boards.py; 4 tests; live: Himalayas 125 postings → 40 pass (remote-worldwide/India ML), Remotive 15 → 1 pass (evals/results/G02/S03.03-live-remote-boards.txt). SimplifyJobs deferred (US-auth internships, low value for him) |
 | S03.04 | Liveness | done | pipeline/liveness.py: full-feed boards (GH/Ashby/Lever/Workable) → absent from a board fetched OK today = expired; failed board/source never expires anything; search sources age out after 21 days; liveness stage in daily; 3 unit + 1 integration test. Live check on next daily run |
 | S03.05 | Near-duplicate detection | done | pipeline/neardupe.py (rapidfuzz v1; embeddings upgrade when trijya-3 runs, H1). Audit v1 FALSELY merged 1,145 real roles (token_set_ratio subset=100) → v2: cross-source only, token_sort_ratio ≥90 on org + location-stripped title; real-data audit 0 false merges; 4 regression pairs from audit (evals/results/G02/S03.05-neardupe-audit.txt). Liveness sees merged-away keys as seen |
-| S03.06–S03.07 | Labelling UI, E-03 | todo | S03.07 needs H5 |
+| S03.06 | Labelling view | done | dashboard /label: BLIND labelling (Evaluator scores hidden to avoid anchoring), queue interleaved across apply/maybe/skip, yes/no + 1–5 + reason → labels table via owner RLS; lint+build OK. Usable once H11 (data) + H2/local run |
+| S03.07 | E-03 baseline: Pranav labels 40 | blocked:H5 | also needs H11 (evaluations must be in Supabase) |
 | S04.01–S04.06 | Messy sources + Extractor | todo | S04.02 needs H1; S04.03 needs H3/H9 |
 | S05.01–S05.07 | Other tracks + Cartographer | todo | |
 | S06.01 | Master CV 2-page + 1-page | todo | can start any time |
@@ -91,3 +92,4 @@
 | 16 | 2026-10-12 | S03.02 registry (live harvest in background) + S03.03 Himalayas/Remotive | +41 eligible remote roles; found & fixed local-state race (stages now serialised in local mode) | S03.02 finish + S03.04 liveness |
 | 17 | 2026-10-12 | S03.04 feed-presence liveness (registry harvest still running in background) | tests pass incl. 'failed board never expires' | S03.05 near-duplicate detection; registry results when done |
 | 18 | 2026-10-12 | S03.05 near-dupes: audit caught 1,145 false merges in v1, fixed | 0 false merges on real data | S03.06 labelling UI (dashboard) |
+| 19 | 2026-10-12 | S03.06 blind labelling view | build OK | P04: S04.01 Extractor + E-01 dataset (registry harvest still running) |
