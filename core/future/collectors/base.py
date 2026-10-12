@@ -61,6 +61,7 @@ def polite_client(timeout_s: float = 20) -> httpx.Client:
 
 
 REQUEST_DEADLINE_S = 60.0
+MAX_DEADLINE_RETRIES = 1
 
 
 class RequestDeadline(httpx.TransportError):
@@ -89,13 +90,20 @@ def fetch(client: httpx.Client, url: str, deadline_s: float = REQUEST_DEADLINE_S
 
 def get_json(client: httpx.Client, url: str, *, retries: int = 3, backoff_s: float = 2.0,
              sleep=time.sleep, deadline_s: float = REQUEST_DEADLINE_S) -> Any:
-    """GET JSON with a hard per-request deadline; retry on 429/5xx/network errors/deadline.
+    """GET JSON with a hard per-request deadline; retry on 429/5xx/network errors.
+    A deadline overrun is retried only once: a board that stalls for 60s usually stalls
+    again, and 3 retries cost ~4 min per dead board (2026-10-13 daily run).
     4xx (except 429) is not retried."""
     last: Exception | None = None
+    deadlines = 0
     for attempt in range(retries + 1):
         try:
             status, body = fetch(client, url, deadline_s)
-        except httpx.TransportError as exc:          # includes RequestDeadline
+        except RequestDeadline as exc:
+            last, deadlines = exc, deadlines + 1
+            if deadlines > MAX_DEADLINE_RETRIES:
+                raise
+        except httpx.TransportError as exc:
             last = exc
         else:
             if status == 429 or status >= 500:

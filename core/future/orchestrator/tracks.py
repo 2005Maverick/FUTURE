@@ -21,7 +21,7 @@ from future.collectors.base import Collector, RawRecord
 from future.llm import claude_runner
 from future.orchestrator.budget import BudgetGuard
 from future.orchestrator.collect import SourceSpec, health_for
-from future.orchestrator.daily import opportunity_row
+from future.orchestrator.daily import opportunity_row, progress_log
 from future.orchestrator.runlog import run_stage
 from future.orchestrator.stages import JsonlProgress, process_items
 from future.pipeline import tracks as tn
@@ -43,9 +43,10 @@ class TracksResult:
     digest_path: str | None
 
 
-def _collect(store: Store, ctx, plan: list[tuple[Collector, SourceSpec]]) -> list[RawRecord]:
+def _collect(store: Store, ctx, plan: list[tuple[Collector, SourceSpec]], log=lambda msg: None) -> list[RawRecord]:
     records: list[RawRecord] = []
     for collector, spec in plan:
+        log(f"collecting {collector.name}…")
         try:
             sid = store.ensure_source(collector.name, kind=spec.kind, track=spec.track, method=spec.method,
                                       url=spec.url, terms_verdict=spec.terms_verdict)
@@ -58,6 +59,7 @@ def _collect(store: Store, ctx, plan: list[tuple[Collector, SourceSpec]]) -> lis
             records += recs
             ctx.event("source_collected", f"{collector.name}: {len(recs)} records, {added} new",
                       errors=rep.errors[:3])
+            log(f"{collector.name}: {len(recs)} records, {added} new, {rep.units_failed} units failed")
         except Exception as exc:  # one source failing must not stop the others
             ctx.event("source_failed", collector.name, level="error", error=str(exc)[:300])
     return records
@@ -129,7 +131,7 @@ def run_tracks(store: Store, plan: list[tuple[Collector, SourceSpec]], *, today:
     guard = BudgetGuard(store)
     queue, progress = PageQueue(data_dir / "queue.jsonl"), JsonlProgress(data_dir / "extract_progress.jsonl")
     with run_stage(store, "collect_tracks") as ctx:
-        records = _collect(store, ctx, plan)
+        records = _collect(store, ctx, plan, progress_log(today, "tracks") if write_file else (lambda msg: None))
         pages = [r for r in records if r.source == "pagewatch"]
         queue.add(pages)
         ctx.items_in, ctx.items_out = len(records), len(records)

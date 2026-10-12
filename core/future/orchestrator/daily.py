@@ -79,6 +79,13 @@ def _manual_cache(source: str) -> set[str]:
     return _MANUAL[source]
 
 
+def progress_log(today: dt.date, stage: str):
+    """Append-only progress file so a long run is observable while it runs (the local
+    store only persists at the end)."""
+    from future.collectors.registry import ProgressLog
+    return ProgressLog(config.REPO_ROOT / "private" / "logs" / f"{stage}-{today.isoformat()}.log")
+
+
 def run_daily(store: Store, plan: list[tuple[Collector, SourceSpec]], *, today: dt.date,
               runner: Callable = claude_runner.run, max_evals: int = 40,
               write_file: bool = True) -> DailyResult:
@@ -86,8 +93,10 @@ def run_daily(store: Store, plan: list[tuple[Collector, SourceSpec]], *, today: 
     records: list[RawRecord] = []
     new_raw = 0
 
+    log = progress_log(today, "daily") if write_file else (lambda msg: None)
     with run_stage(store, "collect") as ctx:
         for collector, spec in plan:
+            log(f"collecting {collector.name}…")
             try:
                 sid = store.ensure_source(collector.name, kind=spec.kind, track=spec.track, method=spec.method,
                                           url=spec.url, terms_verdict=spec.terms_verdict)
@@ -99,6 +108,7 @@ def run_daily(store: Store, plan: list[tuple[Collector, SourceSpec]], *, today: 
                 records += recs
                 new_raw += added
                 ctx.event("source_collected", f"{collector.name}: {rep.records} records, {added} new")
+                log(f"{collector.name}: {rep.records} records, {added} new, {rep.units_failed} units failed")
             except Exception as exc:  # one source failing must not stop the run
                 ctx.event("source_failed", collector.name, level="error", error=str(exc)[:300])
         ctx.items_in, ctx.items_out = len(records), new_raw

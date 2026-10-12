@@ -33,12 +33,29 @@ def test_fetch_cuts_off_a_trickling_response_at_the_deadline():
         base.fetch(trickle_client(), "https://slow.example/jobs", deadline_s=30, clock=fake_clock())
 
 
-def test_get_json_treats_deadline_as_retryable_then_raises(monkeypatch):
-    monkeypatch.setattr(base, "fetch", lambda c, u, d: (_ for _ in ()).throw(base.RequestDeadline("x")))
+def test_get_json_retries_a_deadline_only_once(monkeypatch):
+    calls = []
+
+    def stalled(c, u, d):
+        calls.append(u)
+        raise base.RequestDeadline("x")
+    monkeypatch.setattr(base, "fetch", stalled)
     slept = []
     with pytest.raises(base.RequestDeadline):
-        base.get_json(httpx.Client(), "https://slow.example", retries=2, sleep=slept.append)
-    assert len(slept) == 2
+        base.get_json(httpx.Client(), "https://slow.example", retries=3, sleep=slept.append)
+    assert len(calls) == 2 and len(slept) == 1
+
+
+def test_other_network_errors_still_get_all_retries(monkeypatch):
+    calls = []
+
+    def flaky(c, u, d):
+        calls.append(u)
+        raise httpx.ConnectError("reset")
+    monkeypatch.setattr(base, "fetch", flaky)
+    with pytest.raises(httpx.ConnectError):
+        base.get_json(httpx.Client(), "https://flaky.example", retries=3, sleep=lambda s: None)
+    assert len(calls) == 4
 
 
 def test_collector_records_stalled_board_and_continues(monkeypatch):
