@@ -1,6 +1,6 @@
 # ADR-001: Calling Claude headlessly on the Max subscription
 
-**Status:** accepted for interactive and clean-environment runs (2026-10-12). Unattended Task Scheduler run still to verify (ST01.02.02).
+**Status:** accepted (2026-10-12). Verified interactively, in a clean environment, **and from Windows Task Scheduler** (ST01.02.02).
 
 ## Context
 - The pipeline must call Claude without an API key (owner decision), using Pranav's shared Max 20x plan.
@@ -23,7 +23,10 @@
 - The runner refuses to start if `ANTHROPIC_API_KEY` is set.
 
 ## Open
-- ST01.02.02: confirm the same call works from Windows Task Scheduler with no user session at the console.
-  Fallback: a Desktop scheduled task, or `claude setup-token` (H-tok).
+- ST01.02.02 PASSED: a Task Scheduler task (user logged on; `scripts/run_probe.cmd` → `scheduler_probe.py`) ran with no
+  Claude session vars and got `OK` from claude-haiku-5-5 (411 tokens). Evidence: `evals/results/G01/R1-scheduler.txt`.
+  Task Scheduler still reported LastTaskResult 0x8007042B even though the probe succeeded. Re-check the exit-code
+  handling when registering the real jobs (ST01.04.05). Untested: runs while **logged off** need a stored password,
+  which is out of scope (the laptop stays logged in).
 - `total_cost_usd` came out identical for Haiku and Sonnet on a tiny prompt. **Budget on tokens, not on cost_usd**,
   until per-model cost reporting is checked on realistic prompts.
