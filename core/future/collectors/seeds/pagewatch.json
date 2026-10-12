@@ -1,0 +1,31 @@
+[
+  {"id": "oist-research-internship", "url": "https://www.oist.jp/admissions/research-internship", "track": "research", "org": "Okinawa Institute of Science and Technology (OIST)", "kind": "programme"},
+  {"id": "daad-india-scholarship-news", "url": "https://www.daad.in/en/about-us/news/?news-category%5B%5D=scholarships", "track": "research", "org": "DAAD India (WISE calls are announced here)", "kind": "scholarship"},
+  {"id": "msr-india-research-fellow", "url": "https://www.microsoft.com/en-us/research/academic-program/research-fellows-program-at-microsoft-research-india/", "track": "research", "org": "Microsoft Research India", "kind": "fellowship"},
+  {"id": "eth-ssrf", "url": "https://inf.ethz.ch/studies/summer-research-fellowship.html", "track": "research", "org": "ETH Zurich, Department of Computer Science", "kind": "fellowship"},
+  {"id": "summer-at-epfl", "url": "https://summer.epfl.ch/", "track": "research", "org": "EPFL, School of Computer and Communication Sciences", "kind": "fellowship"},
+  {"id": "mitacs-globalink", "url": "https://www.mitacs.ca/our-programs/globalink-research-internship-students/", "track": "research", "org": "Mitacs", "kind": "programme"},
+  {"id": "cmu-riss", "url": "https://riss.ri.cmu.edu/", "track": "research", "org": "Carnegie Mellon University Robotics Institute", "kind": "programme"},
+  {"id": "kaust-internships", "url": "https://admissions.kaust.edu.sa/study/internships", "track": "research", "org": "KAUST", "kind": "programme"},
+  {"id": "charpak-summer-training", "url": "https://www.inde.campusfrance.org/france-excellence-charpak-summer-training-scholarship", "track": "research", "org": "Campus France India", "kind": "scholarship"},
+  {"id": "caltech-surf", "url": "https://sfp.caltech.edu/undergraduate-research/programs/surf", "track": "research", "org": "Caltech Student-Faculty Programs", "kind": "programme"},
+  {"id": "utokyo-utrip", "url": "https://www.s.u-tokyo.ac.jp/en/utrip/", "track": "research", "org": "University of Tokyo, School of Science", "kind": "programme"},
+
+  {"id": "epfl-master-excellence", "url": "https://www.epfl.ch/education/master/master-excellence-fellowships/", "track": "ms", "org": "EPFL", "kind": "fellowship"},
+  {"id": "eth-esop", "url": "https://ethz.ch/students/en/studies/financial/scholarships/excellencescholarship.html", "track": "ms", "org": "ETH Zurich", "kind": "scholarship"},
+  {"id": "tum-msc-rci", "url": "https://www.tum.de/en/studies/degree-programs/detail/robotics-cognition-intelligence-master-of-science-msc", "track": "ms", "org": "Technical University of Munich", "kind": "programme"},
+  {"id": "tum-application", "url": "https://www.tum.de/en/studies/application", "track": "ms", "org": "Technical University of Munich", "kind": "programme"},
+  {"id": "nus-mcomp", "url": "https://www.comp.nus.edu.sg/programmes/pg/mcomp-gen/", "track": "ms", "org": "National University of Singapore, School of Computing", "kind": "programme"},
+  {"id": "erasmus-mundus-catalogue", "url": "https://www.eacea.ec.europa.eu/scholarships/erasmus-mundus-catalogue_en", "track": "ms", "org": "European Education and Culture Executive Agency", "kind": "scholarship"},
+  {"id": "mext-scholarship", "url": "https://www.mext.go.jp/en/policy/education/highered/title02/detail02/sdetail02/1373897.htm", "track": "ms", "org": "MEXT Japan", "kind": "scholarship"},
+  {"id": "kaust-admissions", "url": "https://admissions.kaust.edu.sa/", "track": "ms", "org": "KAUST", "kind": "programme"},
+  {"id": "inlaks-scholarship", "url": "https://inlaksfoundation.org/opportunities/scholarship/", "track": "ms", "org": "Inlaks Shivdasani Foundation", "kind": "scholarship"},
+
+  {"id": "yc-apply", "url": "https://www.ycombinator.com/apply", "track": "funding", "org": "Y Combinator", "kind": "accelerator"},
+  {"id": "entrepreneurs-first", "url": "https://www.joinef.com/", "track": "funding", "org": "Entrepreneurs First", "kind": "accelerator"},
+  {"id": "thiel-fellowship", "url": "https://thielfellowship.org/", "track": "funding", "org": "Thiel Fellowship", "kind": "fellowship"},
+  {"id": "z-fellows", "url": "https://www.zfellows.com/", "track": "funding", "org": "Z Fellows", "kind": "fellowship"},
+  {"id": "antler-india", "url": "https://www.antler.co/location/india", "track": "funding", "org": "Antler", "kind": "accelerator"},
+  {"id": "a16z-speedrun", "url": "https://speedrun.a16z.com/", "track": "funding", "org": "a16z speedrun", "kind": "accelerator"},
+  {"id": "1517-grants", "url": "https://www.1517fund.com/grants", "track": "funding", "org": "1517 Fund", "kind": "grant"}
+]
