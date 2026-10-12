@@ -63,10 +63,16 @@
 | S03.06 | Labelling view | done | dashboard /label: BLIND labelling (Evaluator scores hidden to avoid anchoring), queue interleaved across apply/maybe/skip, yes/no + 1–5 + reason → labels table via owner RLS; lint+build OK. Usable once H11 (data) + H2/local run |
 | S03.07 | E-03 baseline: Pranav labels 40 | blocked:H5 | also needs H11 (evaluations must be in Supabase) |
 | S04.01 | Extractor agent + E-01 | doing | agent + quote-verified guards (8 tests). E-01 PARTIAL: 12 real channel/group posts (private set) → Haiku 12/12 counts, 24/24 fields, 0 invented, ~2.3k tok/text (evals/results/G04/E-01-haiku.txt). Needs 50 harder cases (relative dates, multi-link, pages) — more WhatsApp posts need H12 |
-| S04.02–S04.06 | Local model, inbox, WhatsApp pass, page watch, E-11 | todo | S04.02 needs H1; S04.03 needs H3/H9 |
-| S05.01–S05.07 | Other tracks + Cartographer | todo | |
-| S06.01 | Master CV 2-page + 1-page | todo | can start any time |
-| S06.02–S06.06 | Fact file, contacts, Writer, Critic, approvals | todo | S06.03 needs H4 |
+| S04.02–S04.04 | Local model, inbox, WhatsApp pass | todo | S04.02 needs H1; S04.03 needs H3/H9; S04.04 needs H12 |
+| S04.05 | Page watcher | done | collectors/pagewatch.py; 27 verified official pages (research 11, funded MS 9, funding 7; 13 dropped with reasons: 403/Cloudflare/JS-only/404); change detection on `<main>` text (ad carousel false-change found and fixed); 24 tests; live 27/27 ok, immediate rerun 0 false changes. Changed pages → durable queue → Extractor (orchestrator/tracks.py) |
+| S04.06 | E-11 prompt injection | done (PASS) | 10 synthetic attack cases (evals/datasets/e11_injection.json). Live run 1: 9/10 (EV-03 one_line repeated "send your CV"). Code guards added (agents/guards.py): AI-addressed quotes dropped, apply→maybe without evidence or when suspect, links/AI-directed sentences scrubbed from digest text, one_line replaced on injected postings, `<<< >>>` neutralised; 0 false positives on 8,530 real postings. Live run 2: 10/10 PASS, 35.6k tokens (evals/results/G04/E-11-live.txt). Known limit: an attacker URL genuinely in the text can't be told apart by code; model guards it |
+| S05.03 | Research labs (OpenAlex) | done | collectors/openalex.py + `--stage labs` (weekly); live 3 topics: 9 requests, $0.006, 88 researchers (Levine, Finn, Torralba…); students filtered by h-index <10; profile errors (merged/split authors) need a human check before outreach |
+| S05.04 | Hackathons | done (partial) | MLH (season page JSON) + Kaggle (API) live: 61 MLH (1 in India, 0 online) + 10 Kaggle; gov hackathons filtered. Devpost NOT scraped: its terms ban automated access → alert emails (S04.03, needs H3/H9). lablab.ai + MLH Global Hack Week (online) still todo |
+| S05.tracks | Tracks stage (hackathons + watched pages → Extractor → opportunities) | done | pipeline/tracks.py + orchestrator/tracks.py, `--stage tracks`; deterministic eligibility (in-person abroad / deadline passed / student "labs" fail, rest unclear); liveness: deadline-passed rows close, pagewatch/labs never age out; 17 tests. Track rubrics for the Evaluator still todo (S05.01/02/05) |
+| S05.01–S05.07 (rest) | Track rubrics, funding sources, Cartographer | todo | |
+| S06.01 | Master CV 2-page + 1-page | review:Pranav | private/cv/ 2-page + 1-page PDFs (page counts verified); corrections applied (CVPR = Workshops, ACL = SRW, 20+ papers and ₹120 Cr removed); 3 questions for Pranav |
+| S06.02 | Fact file | review:Pranav | private/facts.yaml: 96 claims with source + sensitivity, 11 excluded claims the Writer must never use |
+| S06.03–S06.06 | Contacts, Writer, Critic, approvals | todo | S06.03 needs H4; Writer waits on CV approval |
 | S07.* | Act & track | todo | needs G06, H3, H7 |
 | S08.* | Hardening | todo | |
 | S09.* | Operate & learn | todo | |
@@ -99,3 +105,4 @@
 | 21 | 2026-10-12 | Registry progress log + S04.01 Extractor agent (code + guards) | 8 tests pass | E-01 dataset from real WhatsApp channel posts + pages |
 | 22 | 2026-10-12 | E-01 harness + Haiku baseline (12 real posts); WhatsApp Edge session found logged out → H12 | 100% on small set; not counted as pass | daily run (expanded boards) still running |
 | 23 | 2026-10-13 | INCIDENT: daily run hung ~5h on one Cloudflare-hosted board (httpx timeout is per-read, not per-request; laptop likely slept). Killed it (state untouched). FIX: base.fetch hard whole-request deadline (60s, streamed), used by all collectors + registry; trickle-forever regression tests | 4 new adversarial tests pass | rerun daily; then S04.05 page watcher / E-11 |
+| 24 | 2026-10-13 | Parallel build (5 agents): page watcher, OpenAlex labs, MLH/Kaggle, E-11 suite, master CV + fact file. Integrated: E-11 code guards (run 1 9/10 → run 2 10/10), tracks + labs stages, deadline liveness, E-08 flake fixed (kill on observed progress), deadline retries 3→1, progress logs | full suite green 3× in a row; pushed to dev | daily run result; CV approval; track rubrics (S05.01/02/05) |
