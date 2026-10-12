@@ -1,0 +1,5 @@
+S02.06 dashboard v0 auth test (next start, prod build) 2026-10-12
+lint: clean | build: OK (/, /opportunities, /digest partial-prerender; /login static; /auth/callback dynamic; proxy active)
+GET / -> 307 /login | GET /opportunities -> 307 /login | GET /digest -> 307 /login | GET /login -> 200 (form present)
+forged auth cookie on /opportunities -> 307 /login
+login action only sends a magic link to OWNER_EMAIL (server env); other addresses get the same reply, no email sent

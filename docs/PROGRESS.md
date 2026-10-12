@@ -52,8 +52,8 @@
 | S02.04 | Ranking + digest v1 | done | pipeline/ranking.py (deterministic, per-component breakdown, weights PROVISIONAL until E-03) + digest/build.py; 9 tests; real digest rendered from 12 live evals (private/digests/2026-10-12.md). Found: evals must be keyed by dedup_key, not org+title (Stripe same title in 4 cities) → requirement for S02.05b |
 | S02.05b | Daily stage: collect→normalize→evaluate (keyed by dedup_key, eval cache, budget-ordered)→rank→digest; local persistence until H11 | done | orchestrator/daily.py + LocalFileStore + migrations 0003/0004; 7 integration tests incl. keying regression; live: run1 6 evals/43k tokens, run2 0 tokens all cached (evals/results/G02/S02.05b-live-daily.txt). Finding: judge variance on close calls (3 vs 4) → E-03 |
 | S02.05 | Sheet mirror (Apps Script) | blocked:H11 | reads Supabase; no rows there until the secret key is set |
-| S02.06 | Dashboard v0 (local first; deploy needs H2) | todo | |
-| G02 | Gate | todo | |
+| S02.06 | Dashboard v0 (local first; deploy needs H2) | doing | Next 16.4 (proxy.ts, Cache Components + Suspense per bundled docs) + Supabase SSR auth; Live (runs + realtime events), Opportunities, Digest; owner-only magic link; lint+build OK; auth test: all private routes 307→/login incl. forged cookie (evals/results/G02/S02.06-dashboard-auth.txt); realtime migration 0005. Remaining: deploy (H2), first sign-in + app_owner row (after H11 data), Supabase auth redirect URLs |
+| G02 | Gate | blocked:H11 | pipeline E2E proven locally (S02.05b); 'visible on dashboard + Sheet' needs DB writes. DECISION 2026-10-12: data-side P03 work (more sources) proceeds meanwhile; display-dependent steps wait |
 | S03.01–S03.07 | Jobs track complete | todo | S03.07 needs H5 |
 | S04.01–S04.06 | Messy sources + Extractor | todo | S04.02 needs H1; S04.03 needs H3/H9 |
 | S05.01–S05.07 | Other tracks + Cartographer | todo | |
@@ -81,3 +81,4 @@
 | 12 | 2026-10-12 | S02.04 ranking + digest (interrupted by Pranav's server question, resumed) | 9 tests; real digest; keying requirement found | S02.05b daily stage wiring |
 | 13 | 2026-10-12 | S02.05b daily pipeline end-to-end + local persistence | live E2E works; cache = 0 tokens on rerun; city bug fixed | S02.06 dashboard v0 (code + auth; deploy needs H2, data needs H11) |
 | 13b | 2026-10-12 | State size fix (descriptions only for candidates: 41 MB → 8.4 MB) | MISTAKE: deleted state.json to rebuild → lost 6 cached evals (~43k tokens) + overwrote today's digest; fixed with automatic .bak snapshot on every save + test | S02.06 dashboard v0 |
+| 14 | 2026-10-12 | S02.06 dashboard v0 code + auth tests | build OK; private routes locked; deploy/data wait on H2/H11 | S03.01 Lever/Ashby/Workable/SmartRecruiters collectors (G02 display pending) |
