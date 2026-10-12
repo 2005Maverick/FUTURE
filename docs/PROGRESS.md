@@ -54,7 +54,8 @@
 | S02.05 | Sheet mirror (Apps Script) | blocked:H11 | reads Supabase; no rows there until the secret key is set |
 | S02.06 | Dashboard v0 (local first; deploy needs H2) | doing | Next 16.4 (proxy.ts, Cache Components + Suspense per bundled docs) + Supabase SSR auth; Live (runs + realtime events), Opportunities, Digest; owner-only magic link; lint+build OK; auth test: all private routes 307→/login incl. forged cookie (evals/results/G02/S02.06-dashboard-auth.txt); realtime migration 0005. Remaining: deploy (H2), first sign-in + app_owner row (after H11 data), Supabase auth redirect URLs |
 | G02 | Gate | blocked:H11 | pipeline E2E proven locally (S02.05b); 'visible on dashboard + Sheet' needs DB writes. DECISION 2026-10-12: data-side P03 work (more sources) proceeds meanwhile; display-dependent steps wait |
-| S03.01–S03.07 | Jobs track complete | todo | S03.07 needs H5 |
+| S03.01 | Lever/Ashby/Workable collectors (+SmartRecruiters) | done | collectors/ats.py, common payload shape → one normaliser; seeds: 32 Ashby AI boards (OpenAI, Sarvam, Physical Intelligence, Cohere, Perplexity…), Lever (Meesho, CRED), Workable (Hugging Face); 5 tests; live 9,502 postings all sources ok, +16 eligible from new sources (evals/results/G02/S03.01-live-multi-source.txt). SmartRecruiters → S03.02 (needs company ids). En-dash years gap fixed |
+| S03.02–S03.07 | Registry, remote boards, liveness, near-dupes, labelling UI, E-03 | todo | S03.07 needs H5 |
 | S04.01–S04.06 | Messy sources + Extractor | todo | S04.02 needs H1; S04.03 needs H3/H9 |
 | S05.01–S05.07 | Other tracks + Cartographer | todo | |
 | S06.01 | Master CV 2-page + 1-page | todo | can start any time |
@@ -82,3 +83,4 @@
 | 13 | 2026-10-12 | S02.05b daily pipeline end-to-end + local persistence | live E2E works; cache = 0 tokens on rerun; city bug fixed | S02.06 dashboard v0 (code + auth; deploy needs H2, data needs H11) |
 | 13b | 2026-10-12 | State size fix (descriptions only for candidates: 41 MB → 8.4 MB) | MISTAKE: deleted state.json to rebuild → lost 6 cached evals (~43k tokens) + overwrote today's digest; fixed with automatic .bak snapshot on every save + test | S02.06 dashboard v0 |
 | 14 | 2026-10-12 | S02.06 dashboard v0 code + auth tests | build OK; private routes locked; deploy/data wait on H2/H11 | S03.01 Lever/Ashby/Workable/SmartRecruiters collectors (G02 display pending) |
+| 15 | 2026-10-12 | S03.01 Ashby/Lever/Workable collectors | 4 sources live, 9.5k postings, OpenAI/Sarvam roles surfaced; en-dash gap fixed | S03.02 company registry (YC/VC portfolios + Common Crawl) |

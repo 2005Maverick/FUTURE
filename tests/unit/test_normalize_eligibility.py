@@ -32,6 +32,9 @@ def test_years_parsing():
     assert max_years_required("Exp: 3-15yrs") == 3
     assert max_years_required("Exp : 3- 12 yrs") == 3
     assert max_years_required("Exp: 5 - 10yrs") == 5
+    # en/em dashes seen live on Sarvam (Ashby) postings
+    assert max_years_required("4–8 years of experience in data infrastructure") == 4
+    assert max_years_required("3—5 years experience") == 3
 
 
 def test_remote_scope():

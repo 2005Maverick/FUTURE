@@ -1,0 +1,3 @@
+S03.01 live daily 2026-10-12: sources greenhouse=6031 ashby=3398 lever=66 workable=7 (all health ok); collected=9502 new_raw=3472 opportunities=8529 pass=52 unclear=645 skipped=7832; evaluated 8 (~50k tokens), shortlisted 5 (OpenAI Applied AI Engineer Delhi 3/5 maybe; Sarvam eval DS 3/4 maybe ...). 16 new eligible roles from new sources (OpenAI, Sarvam x7, Cerebras, Supabase x5, Anyscale).
+Gap found+fixed: en-dash year ranges ("4-8 years" with U+2013) bypassed the pre-filter.
+SmartRecruiters deferred to S03.02 (needs company-id registry).

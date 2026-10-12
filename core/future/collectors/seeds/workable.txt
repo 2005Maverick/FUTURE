@@ -1,0 +1,3 @@
+# Workable account slugs. Verified live 2026-10-12.
+huggingface
+jasper

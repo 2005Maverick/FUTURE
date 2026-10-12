@@ -18,7 +18,10 @@ BLANKS = re.compile(r"\n\s*\n+")
 MAX_DESC = 12_000
 
 ORG_NAMES = {"scaleai": "Scale AI", "togetherai": "Together AI", "stabilityai": "Stability AI",
-             "mongodb": "MongoDB", "gitlab": "GitLab"}
+             "mongodb": "MongoDB", "gitlab": "GitLab", "openai": "OpenAI", "elevenlabs": "ElevenLabs",
+             "huggingface": "Hugging Face", "langchain": "LangChain", "physicalintelligence": "Physical Intelligence",
+             "sarvam": "Sarvam AI", "cred": "CRED", "cursor": "Cursor (Anysphere)", "lightning": "Lightning AI",
+             "deepgram": "Deepgram", "baseten": "Baseten"}
 
 
 def html_to_text(raw: str) -> str:
@@ -77,6 +80,11 @@ class Opportunity:
     @property
     def status(self) -> str:
         return "skipped" if self.eligibility.result == "fail" else "verified"
+
+
+def from_ats(raw: dict[str, Any]) -> Opportunity:
+    """Any ATS collector's common payload (Greenhouse, Ashby, Lever, Workable) → Opportunity."""
+    return from_greenhouse(raw)
 
 
 def from_greenhouse(raw: dict[str, Any]) -> Opportunity:

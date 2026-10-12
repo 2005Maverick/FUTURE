@@ -22,10 +22,10 @@ SENIOR_TITLE = re.compile(r"\b(senior|sr\.?|staff|principal|lead|manager|directo
 MID_LEVEL = re.compile(r"\bengineer\s+(iii|iv|3|4)\b|\b(swe|sde)\s*(iii|3)\b", re.I)  # level-3+ ladders
 # Only years tied to experience ("5+ years of industry experience", "3-5 yrs' experience");
 # "founded 10 years ago" must not count.
-YEARS = re.compile(r"(\d{1,2})\s*\+?\s*(?:(?:-|to)\s*\d{1,2}\s*\+?\s*)?(?:years|yrs)['’]?\s*(?:of\s+)?"
+YEARS = re.compile(r"(\d{1,2})\s*\+?\s*(?:(?:-|–|—|to)\s*\d{1,2}\s*\+?\s*)?(?:years|yrs)['’]?\s*(?:of\s+)?"
                    r"(?:[\w/-]+\s+){0,4}?experience", re.I)
 # Short form seen live on Cloudflare postings: "Exp: 3-15yrs", "Exp : 3- 12 yrs", "Exp: 5 - 10yrs".
-EXP_SHORT = re.compile(r"\bexp(?:erience)?\s*:\s*(\d{1,2})\s*\+?\s*(?:(?:-|to)\s*\d{1,2}\s*)?\+?\s*(?:yrs|years)\b", re.I)
+EXP_SHORT = re.compile(r"\bexp(?:erience)?\s*:\s*(\d{1,2})\s*\+?\s*(?:(?:-|–|—|to)\s*\d{1,2}\s*)?\+?\s*(?:yrs|years)\b", re.I)
 PHD_REQUIRED = re.compile(r"(phd|ph\.d\.?|doctorate)[^.\n]{0,40}\b(required|must)\b|"
                           r"\b(must|required to)\b[^.\n]{0,40}(phd|ph\.d\.?|doctorate)", re.I)
 UNPAID = re.compile(r"\bunpaid\b|\bno stipend\b|\bvolunteer (position|role)\b", re.I)

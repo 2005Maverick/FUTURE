@@ -22,7 +22,7 @@ from future.pipeline import normalize as norm
 from future.pipeline.ranking import RankInput, rank
 from future.store import Store
 
-NORMALIZERS = {"greenhouse": norm.from_greenhouse}
+NORMALIZERS = {src: norm.from_ats for src in ("greenhouse", "ashby", "lever", "workable")}
 EVALUABLE_STATUSES = {"verified", "scored", "shortlisted"}
 DIGEST_DIR = config.REPO_ROOT / "private" / "digests"
 

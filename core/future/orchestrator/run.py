@@ -34,17 +34,26 @@ def make_store() -> tuple[Store, str]:
     return LocalFileStore(LOCAL_STATE), "local"   # until H11: persistent JSON snapshot in private/
 
 
-def greenhouse_plan():
+def jobs_plan():
+    """All job-board collectors (public APIs, no auth; terms allow automated reads of public boards)."""
+    from future.collectors.ats import AshbyCollector, LeverCollector, WorkableCollector
     from future.collectors.greenhouse import GreenhouseCollector
     from future.orchestrator.collect import SourceSpec
-    return [(GreenhouseCollector(), SourceSpec(kind="ats", track="job", method="greenhouse_job_board_api",
-                                               url="https://boards-api.greenhouse.io", terms_verdict="allowed"))]
+
+    def spec(method, url):
+        return SourceSpec(kind="ats", track="job", method=method, url=url, terms_verdict="allowed")
+    return [
+        (GreenhouseCollector(), spec("greenhouse_job_board_api", "https://boards-api.greenhouse.io")),
+        (AshbyCollector(), spec("ashby_posting_api", "https://api.ashbyhq.com/posting-api")),
+        (LeverCollector(), spec("lever_postings_api", "https://api.lever.co/v0/postings")),
+        (WorkableCollector(), spec("workable_widget_api", "https://apply.workable.com/api")),
+    ]
 
 
 def stage_daily(store: Store, max_evals: int = 40) -> dict:
     from dataclasses import asdict
     from future.orchestrator.daily import run_daily
-    return asdict(run_daily(store, greenhouse_plan(), today=dt.date.today(), max_evals=max_evals))
+    return asdict(run_daily(store, jobs_plan(), today=dt.date.today(), max_evals=max_evals))
 
 
 def stage_healthcheck(store: Store) -> dict:
