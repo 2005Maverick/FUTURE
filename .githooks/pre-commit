@@ -1,0 +1,6 @@
+#!/bin/sh
+# Blocks secrets and personal data from entering this public repo.
+PY=python
+[ -x .venv/Scripts/python.exe ] && PY=.venv/Scripts/python.exe
+[ -x .venv/bin/python ] && PY=.venv/bin/python
+exec "$PY" scripts/precommit_scan.py

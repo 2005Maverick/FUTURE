@@ -1,0 +1,16 @@
+# secrets and personal data never go to git
+.env
+.env.*
+private/
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+*.egg-info/
+# node
+node_modules/
+.next/
+# local artefacts
+evals/results/**/raw/
+*.log

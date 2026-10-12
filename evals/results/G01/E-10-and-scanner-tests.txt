@@ -1,0 +1,12 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.0, pytest-9.1.1, pluggy-1.6.0
+rootdir: D:\dev\personal\future
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.15.1
+collected 17 items
+
+tests\integration\test_e10_commit_blocked.py ....                        [ 23%]
+tests\unit\test_precommit_scan.py .............                          [100%]
+
+============================= 17 passed in 6.32s ==============================
