@@ -18,6 +18,7 @@
 | H8 | Semantic Scholar key | waiting (optional) |
 | H9 | Job-alert sign-ups | waiting |
 | H10 | DESIGN §11 overrides | defaults apply |
+| H12 | WhatsApp Web in Edge was found LOGGED OUT (2026-10-12 ~19:15, `?post_logout=1`). Re-link from phone (Linked devices → Link a device) if channel reading should continue; check phone for any warning | waiting |
 | H11 | Copy Supabase **secret key** (Dashboard → project `future` → Settings → API Keys → Secret) into `.env` as `SUPABASE_SECRET_KEY=` | waiting |
 | H-tok | Run `claude setup-token` once if unattended auth needs it (ST01.02.02) | not needed (CLI login works unattended) |
 
@@ -61,7 +62,7 @@
 | S03.05 | Near-duplicate detection | done | pipeline/neardupe.py (rapidfuzz v1; embeddings upgrade when trijya-3 runs, H1). Audit v1 FALSELY merged 1,145 real roles (token_set_ratio subset=100) → v2: cross-source only, token_sort_ratio ≥90 on org + location-stripped title; real-data audit 0 false merges; 4 regression pairs from audit (evals/results/G02/S03.05-neardupe-audit.txt). Liveness sees merged-away keys as seen |
 | S03.06 | Labelling view | done | dashboard /label: BLIND labelling (Evaluator scores hidden to avoid anchoring), queue interleaved across apply/maybe/skip, yes/no + 1–5 + reason → labels table via owner RLS; lint+build OK. Usable once H11 (data) + H2/local run |
 | S03.07 | E-03 baseline: Pranav labels 40 | blocked:H5 | also needs H11 (evaluations must be in Supabase) |
-| S04.01 | Extractor agent + E-01 | doing | agent .claude/agents/extractor.md + agents/extractor.py: multi-record, every field needs a verbatim quote (code-verified, else null), URLs must appear in text, scam signals; jsonschema + 1 retry; Haiku 5.5 low effort; 8 tests. NEXT: build E-01 dataset (50 real messy texts: WhatsApp channels, pages) + Haiku baseline |
+| S04.01 | Extractor agent + E-01 | doing | agent + quote-verified guards (8 tests). E-01 PARTIAL: 12 real channel/group posts (private set) → Haiku 12/12 counts, 24/24 fields, 0 invented, ~2.3k tok/text (evals/results/G04/E-01-haiku.txt). Needs 50 harder cases (relative dates, multi-link, pages) — more WhatsApp posts need H12 |
 | S04.02–S04.06 | Local model, inbox, WhatsApp pass, page watch, E-11 | todo | S04.02 needs H1; S04.03 needs H3/H9 |
 | S05.01–S05.07 | Other tracks + Cartographer | todo | |
 | S06.01 | Master CV 2-page + 1-page | todo | can start any time |
@@ -96,3 +97,4 @@
 | 19 | 2026-10-12 | S03.06 blind labelling view | build OK | P04: S04.01 Extractor + E-01 dataset (registry harvest still running) |
 | 20 | 2026-10-12 | S03.02 registry results + selection quality fix | 300 boards auto-selected, gig aggregators excluded, target companies prioritised | live daily run with expanded boards |
 | 21 | 2026-10-12 | Registry progress log + S04.01 Extractor agent (code + guards) | 8 tests pass | E-01 dataset from real WhatsApp channel posts + pages |
+| 22 | 2026-10-12 | E-01 harness + Haiku baseline (12 real posts); WhatsApp Edge session found logged out → H12 | 100% on small set; not counted as pass | daily run (expanded boards) still running |
