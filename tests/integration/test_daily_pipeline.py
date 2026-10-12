@@ -88,6 +88,16 @@ def test_second_run_uses_cache_and_persists_across_restart(tmp_path):
     assert r.evaluated_now == 0 and r.evaluated_cached == 3 and len(calls) == 3
 
 
+def test_save_keeps_previous_snapshot_as_backup(tmp_path):
+    path, calls = tmp_path / "s.json", []
+    store = LocalFileStore(path)
+    run(store, DATA, calls)
+    store.save()
+    store.save()
+    backup = LocalFileStore(tmp_path / "s.bak.json")
+    assert len(backup.evals) == 3            # cached evaluations survive in the backup
+
+
 def test_changed_posting_is_reevaluated_only_once(tmp_path):
     store, calls = LocalFileStore(tmp_path / "s.json"), []
     run(store, DATA, calls)

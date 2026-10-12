@@ -80,3 +80,4 @@
 | 11 | 2026-10-12 | S02.03 Evaluator agent v1 + live slice + token optimisation | 12 live evals sane & evidence-backed; -55% tokens/eval | S02.04 ranking + digest v1 |
 | 12 | 2026-10-12 | S02.04 ranking + digest (interrupted by Pranav's server question, resumed) | 9 tests; real digest; keying requirement found | S02.05b daily stage wiring |
 | 13 | 2026-10-12 | S02.05b daily pipeline end-to-end + local persistence | live E2E works; cache = 0 tokens on rerun; city bug fixed | S02.06 dashboard v0 (code + auth; deploy needs H2, data needs H11) |
+| 13b | 2026-10-12 | State size fix (descriptions only for candidates: 41 MB → 8.4 MB) | MISTAKE: deleted state.json to rebuild → lost 6 cached evals (~43k tokens) + overwrote today's digest; fixed with automatic .bak snapshot on every save + test | S02.06 dashboard v0 |

@@ -57,4 +57,7 @@ class LocalFileStore(MemoryStore):
         self.path.parent.mkdir(parents=True, exist_ok=True)
         tmp = self.path.with_suffix(".tmp")
         tmp.write_text(json.dumps(snapshot, ensure_ascii=False, default=str), encoding="utf-8")
+        if self.path.exists():
+            # keep the previous snapshot: losing state also loses cached evaluations (tokens already spent)
+            os.replace(self.path, self.path.with_suffix(".bak.json"))
         os.replace(tmp, self.path)

@@ -52,7 +52,10 @@ def opportunity_row(o: norm.Opportunity) -> dict:
             "canonical_url": o.canonical_url, "dedup_key": o.dedup_key, "location": o.location,
             "remote": o.remote, "countries": o.countries, "deadline": None,
             "eligibility": {"result": o.eligibility.result, "reasons": o.eligibility.reasons},
-            "details": {**o.details, "description": o.description}, "status": o.status,
+            # descriptions only for live candidates: skipped roles never reach a model, and storing
+            # ~5k of them made the local state 41 MB (S02.05b)
+            "details": {**o.details, **({"description": o.description} if o.status != "skipped" else {})},
+            "status": o.status,
             "skip_reason": fails[0][6:] if fails else None}
 
 
