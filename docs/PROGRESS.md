@@ -49,7 +49,8 @@
 | S02.01 | Greenhouse collector (30-company seed) | done | 25 live boards (others use Ashby/Lever → S03.01); live run 25/25 ok, 6,029 postings, 32s, 0 tokens (evals/results/G02/S02.01-live-collect.txt); 7 unit tests |
 | S02.02 | Normaliser + dedup + eligibility v1 (E-02 subset) | done | E-02 15/15 + 0 ineligible pass; live audit caught over-broad title rule (91 passes incl. recruiters) → role-relevance rewrite, 41 real-title regression tests; now 6,029→5,348 deduped → 37 pass / 351 unclear / 4,960 fail, manual audit 0 ineligible passes (evals/results/G02/S02.02-live-audit.txt) |
 | S02.03 | Evaluator v1 (jobs rubric) | done | agent .claude/agents/evaluator.md + rubrics/jobs.md + private profile; deterministic guards (verbatim quotes, jsonschema, rubric-consistent recs, budget); live 12 roles: 65/66 quotes verified, 1 invented quote dropped; tokens cut 13.4k→6.0k/eval via single-turn JSON (ADR-001 #6); pre-filter gap 'Exp: 3-15yrs' fixed. Quality vs Pranav = E-03 (needs H5) |
-| S02.04 | Ranking + digest v1 | todo | |
+| S02.04 | Ranking + digest v1 | done | pipeline/ranking.py (deterministic, per-component breakdown, weights PROVISIONAL until E-03) + digest/build.py; 9 tests; real digest rendered from 12 live evals (private/digests/2026-10-12.md). Found: evals must be keyed by dedup_key, not org+title (Stripe same title in 4 cities) → requirement for S02.05b |
+| S02.05b | Daily stage: collect→normalize→evaluate (keyed by dedup_key, eval cache, budget-ordered)→rank→digest; local persistence until H11 | todo | added 2026-10-12 |
 | S02.05 | Sheet mirror (Apps Script) | todo | |
 | S02.06 | Dashboard v0 (local first; deploy needs H2) | todo | |
 | G02 | Gate | todo | |
@@ -77,3 +78,4 @@
 | 9 | 2026-10-12 | S02.01 Greenhouse collector + collect stage + source health | live 6,029 postings; 136 rough India/remote ML matches | S02.02 normaliser + dedup + eligibility (US-only remote = ineligible) |
 | 10 | 2026-10-12 | S02.02 normaliser, dedup, eligibility + role relevance | live audit found & fixed false passes; 0 ineligible in final 37 | S02.03 Evaluator v1 (jobs rubric) via skill |
 | 11 | 2026-10-12 | S02.03 Evaluator agent v1 + live slice + token optimisation | 12 live evals sane & evidence-backed; -55% tokens/eval | S02.04 ranking + digest v1 |
+| 12 | 2026-10-12 | S02.04 ranking + digest (interrupted by Pranav's server question, resumed) | 9 tests; real digest; keying requirement found | S02.05b daily stage wiring |
